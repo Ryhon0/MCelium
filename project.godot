@@ -15,6 +15,7 @@ run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.0", "C#", "Mobile")
 boot_splash/show_image=false
 boot_splash/image="res://icon.png"
+boot_splash/bg_color=Color(0.0901961, 0.0901961, 0.0901961, 1)
 config/icon="res://icon.svg"
 
 [dotnet]
@@ -24,3 +25,4 @@ project/assembly_name="MCelium"
 [rendering]
 
 renderer/rendering_method="mobile"
+environment/defaults/default_clear_color=Color(0.0901961, 0.0901961, 0.0901961, 1)

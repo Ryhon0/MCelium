@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baw5bff0fvwmy"
-path="res://.godot/imported/Minecraft_skin_template.png-4b65375cbda21df5a4d9688590570d2f.ctex"
+uid="uid://ruc4bld6bxiw"
+path="res://.godot/imported/plus.svg-b2d80ae8687eb22ffbb1642f04f67dad.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Minecraft_skin_template.png"
-dest_files=["res://.godot/imported/Minecraft_skin_template.png-4b65375cbda21df5a4d9688590570d2f.ctex"]
+source_file="res://UI/plus.svg"
+dest_files=["res://.godot/imported/plus.svg-b2d80ae8687eb22ffbb1642f04f67dad.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=0.125
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

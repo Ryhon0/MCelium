@@ -1,28 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://bf185tungtrvy"]
+[gd_scene load_steps=5 format=3 uid="uid://bf185tungtrvy"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_si5fj"]
-[ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="2_hdtlr"]
-[ext_resource type="Script" path="res://TimerProgressBar.cs" id="2_ks7aa"]
-[ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://UI/circle_empty.svg" id="2_nmiwh"]
-[ext_resource type="PackedScene" uid="uid://bp4rfbh4cpm6n" path="res://player.glb" id="3_cmm8f"]
+[ext_resource type="Texture2D" uid="uid://ruc4bld6bxiw" path="res://UI/plus.svg" id="2_a64cc"]
+[ext_resource type="PackedScene" uid="uid://ttcpf4vfptq7" path="res://MSAPopup.tscn" id="2_nf5o2"]
+[ext_resource type="PackedScene" uid="uid://cbny488yapva0" path="res://SkinViewer.tscn" id="3_vs1tt"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_siock"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ow3cn"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l5iyr"]
-bg_color = Color(1, 1, 1, 1)
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_51p3l"]
-
-[sub_resource type="Sky" id="Sky_83hu7"]
-sky_material = SubResource("ProceduralSkyMaterial_51p3l")
-
-[sub_resource type="Environment" id="Environment_u20xk"]
-sky = SubResource("Sky_83hu7")
-ambient_light_source = 3
-
-[node name="Main" type="Control" node_paths=PackedStringArray("RetryTimer", "AuthenticateTimer", "URLLabel", "CodeLabel", "TextPageLabel", "UsernameLabel", "Tabs", "TextPage", "AuthenticationPage", "LoggedInPage", "AuthenticatePopup", "PlayerModel", "VersionOptions")]
+[node name="Main" type="Control" node_paths=PackedStringArray("SkinViewer")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,261 +13,47 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_si5fj")
-RetryTimer = NodePath("VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer/TextureProgressBar/RetryTimer")
-AuthenticateTimer = NodePath("VBoxContainer/ColorRect/TabContainer/AuthenticationPage/TimeLeft/AuthenticateTimer")
-URLLabel = NodePath("VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/URLLabel")
-CodeLabel = NodePath("VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/CodeLabel")
-TextPageLabel = NodePath("VBoxContainer/ColorRect/TabContainer/TextPage/TextPageLabel")
-UsernameLabel = NodePath("VBoxContainer/ColorRect/TabContainer/LoggedInPage/Username")
-Tabs = NodePath("VBoxContainer/ColorRect/TabContainer")
-TextPage = NodePath("VBoxContainer/ColorRect/TabContainer/TextPage")
-AuthenticationPage = NodePath("VBoxContainer/ColorRect/TabContainer/AuthenticationPage")
-LoggedInPage = NodePath("VBoxContainer/ColorRect/TabContainer/LoggedInPage")
-AuthenticatePopup = NodePath("VBoxContainer")
-PlayerModel = NodePath("VBoxContainer/ColorRect/TabContainer/LoggedInPage/SubViewportContainer/SubViewport/Camera3D/player")
-VersionOptions = NodePath("Background/HBoxContainer/Versions")
+SkinViewer = NodePath("TabContainer/Skins/VBoxContainer/SkinViewer")
+MSAPopupScene = ExtResource("2_nf5o2")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
+[node name="TabContainer" type="TabContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0885599, 0.0885599, 0.0885599, 1)
+tab_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Background"]
-layout_mode = 1
+[node name="Instances" type="VBoxContainer" parent="TabContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 31.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Versions" type="OptionButton" parent="Background/HBoxContainer"]
-layout_mode = 2
-offset_right = 14.0
-offset_bottom = 648.0
-
-[node name="Button" type="Button" parent="Background/HBoxContainer"]
-layout_mode = 2
-offset_left = 18.0
-offset_right = 196.0
-offset_bottom = 648.0
-text = "Log in using Microsoft"
-
-[node name="Button2" type="Button" parent="Background/HBoxContainer"]
-layout_mode = 2
-offset_left = 200.0
-offset_right = 241.0
-offset_bottom = 648.0
-text = "Play"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Skins" type="HBoxContainer" parent="TabContainer"]
 visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
 
-[node name="ColorRect" type="ColorRect" parent="VBoxContainer"]
-custom_minimum_size = Vector2i(0, 300)
-layout_mode = 2
-offset_top = 174.0
-offset_right = 1152.0
-offset_bottom = 474.0
-color = Color(0.12549, 0.12549, 0.12549, 1)
+[node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
+offset_bottom = 105.0
+size_flags_horizontal = 3
+auto_height = true
+item_count = 1
+icon_mode = 0
+item_0/text = "Upload skin"
+item_0/icon = ExtResource("2_a64cc")
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer/ColorRect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_siock")
-tabs_visible = false
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
+offset_left = 4.0
+offset_right = 4.0
+offset_bottom = 105.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
 
-[node name="TextPage" type="VBoxContainer" parent="VBoxContainer/ColorRect/TabContainer"]
-layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
+[node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("3_vs1tt")]
+offset_right = 0.0
+offset_bottom = 105.0
 
-[node name="TextPageLabel" type="Label" parent="VBoxContainer/ColorRect/TabContainer/TextPage"]
-layout_mode = 2
-offset_top = 111.0
-offset_right = 1152.0
-offset_bottom = 137.0
-text = "Some Text"
-horizontal_alignment = 1
-
-[node name="Control" type="Control" parent="VBoxContainer/ColorRect/TabContainer/TextPage"]
-custom_minimum_size = Vector2i(48, 48)
-layout_mode = 2
-anchors_preset = 0
-offset_left = 552.0
-offset_top = 141.0
-offset_right = 600.0
-offset_bottom = 189.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="Spinner" parent="VBoxContainer/ColorRect/TabContainer/TextPage/Control" instance=ExtResource("2_hdtlr")]
-position = Vector2(24, 24)
-rotation = 111628.0
-Speed = 4.0
-
-[node name="AuthenticationPage" type="VBoxContainer" parent="VBoxContainer/ColorRect/TabContainer"]
+[node name="MSA" parent="." instance=ExtResource("2_nf5o2")]
 visible = false
-layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = 116.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage"]
-layout_mode = 2
-offset_right = 1152.0
-offset_bottom = 404.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-alignment = 1
-
-[node name="URLLabel" type="Label" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer"]
-layout_mode = 2
-offset_top = 122.0
-offset_right = 1152.0
-offset_bottom = 159.0
-theme_override_font_sizes/font_size = 24
-text = "Visit {0} on your device and enter the following code"
-horizontal_alignment = 1
-
-[node name="CodeLabel" type="Label" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer"]
-layout_mode = 2
-offset_top = 163.0
-offset_right = 1152.0
-offset_bottom = 211.0
-theme_override_font_sizes/font_size = 32
-text = "ABCDEF"
-horizontal_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer"]
-layout_mode = 2
-offset_top = 215.0
-offset_right = 1152.0
-offset_bottom = 247.0
-alignment = 1
-
-[node name="Checking" type="Label" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-offset_left = 458.0
-offset_top = 3.0
-offset_right = 657.0
-offset_bottom = 29.0
-text = "Checking in {0} seconds... "
-
-[node name="TextureProgressBar" type="TextureProgressBar" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("Timer")]
-layout_mode = 2
-offset_left = 661.0
-offset_right = 693.0
-offset_bottom = 32.0
-max_value = 2.0
-step = 0.1
-rounded = true
-fill_mode = 4
-texture_progress = ExtResource("2_nmiwh")
-script = ExtResource("2_ks7aa")
-Timer = NodePath("RetryTimer")
-Precission = 50
-
-[node name="RetryTimer" type="Timer" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer/TextureProgressBar"]
-one_shot = true
-
-[node name="Button" type="Button" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer"]
-layout_mode = 2
-offset_left = 507.0
-offset_top = 251.0
-offset_right = 644.0
-offset_bottom = 282.0
-size_flags_horizontal = 4
-text = "Open in browser"
-
-[node name="TimeLeft" type="ProgressBar" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage" node_paths=PackedStringArray("Timer")]
-custom_minimum_size = Vector2i(0, 8)
-layout_mode = 2
-offset_top = 408.0
-offset_right = 1152.0
-offset_bottom = 416.0
-theme_override_styles/background = SubResource("StyleBoxEmpty_ow3cn")
-theme_override_styles/fill = SubResource("StyleBoxFlat_l5iyr")
-value = 50.0
-show_percentage = false
-script = ExtResource("2_ks7aa")
-Timer = NodePath("AuthenticateTimer")
-Precission = 20
-
-[node name="AuthenticateTimer" type="Timer" parent="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/TimeLeft"]
-wait_time = 5.0
-one_shot = true
-
-[node name="LoggedInPage" type="VBoxContainer" parent="VBoxContainer/ColorRect/TabContainer"]
-visible = false
-layout_mode = 2
-offset_right = 40.0
-offset_bottom = 40.0
-alignment = 1
-
-[node name="Label" type="Label" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage"]
-layout_mode = 2
-offset_right = 200.0
-offset_bottom = 48.0
-theme_override_font_sizes/font_size = 32
-text = "Logged in!"
-horizontal_alignment = 1
-
-[node name="Username" type="Label" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage"]
-layout_mode = 2
-offset_top = 52.0
-offset_right = 200.0
-offset_bottom = 89.0
-theme_override_font_sizes/font_size = 24
-text = "Notch_"
-horizontal_alignment = 1
-
-[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage"]
-custom_minimum_size = Vector2i(200, 200)
-layout_mode = 2
-offset_top = 93.0
-offset_right = 200.0
-offset_bottom = 293.0
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage/SubViewportContainer"]
-own_world_3d = true
-transparent_bg = true
-handle_input_locally = false
-size = Vector2i(200, 200)
-render_target_update_mode = 0
-
-[node name="Camera3D" type="Camera3D" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage/SubViewportContainer/SubViewport"]
-current = true
-
-[node name="player" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage/SubViewportContainer/SubViewport/Camera3D" instance=ExtResource("3_cmm8f")]
-transform = Transform3D(0.031, 0, 0, 0, 0.031, 0, 0, 0, 0.031, 0, -0.497087, -1)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="VBoxContainer/ColorRect/TabContainer/LoggedInPage/SubViewportContainer/SubViewport/Camera3D"]
-environment = SubResource("Environment_u20xk")
-
-[connection signal="pressed" from="Background/HBoxContainer/Button" to="." method="Authenticate"]
-[connection signal="pressed" from="Background/HBoxContainer/Button2" to="." method="Play"]
-[connection signal="pressed" from="VBoxContainer/ColorRect/TabContainer/AuthenticationPage/VBoxContainer/Button" to="." method="OpenAuthPage"]

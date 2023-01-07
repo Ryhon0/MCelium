@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://cbny488yapva0"]
+
+[ext_resource type="Script" path="res://SkinViewer.cs" id="1_g1o6a"]
+[ext_resource type="PackedScene" uid="uid://62cjsn2ruii5" path="res://Models/player_rigged.glb" id="1_o0lkl"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lsegj"]
+
+[sub_resource type="Sky" id="Sky_tuxkg"]
+sky_material = SubResource("ProceduralSkyMaterial_lsegj")
+
+[sub_resource type="Environment" id="Environment_xdokb"]
+sky = SubResource("Sky_tuxkg")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+
+[node name="SkinViewer" type="SubViewportContainer" node_paths=PackedStringArray("CameraArm", "Model")]
+offset_right = 383.0
+offset_bottom = 617.0
+size_flags_vertical = 3
+stretch = true
+script = ExtResource("1_g1o6a")
+CameraArm = NodePath("SubViewport/CameraArm")
+Model = NodePath("SubViewport/player_rigged")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(383, 617)
+render_target_update_mode = 4
+
+[node name="player_rigged" parent="SubViewport" instance=ExtResource("1_o0lkl")]
+
+[node name="CameraArm" type="Node3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport/CameraArm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32)
+current = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport"]
+environment = SubResource("Environment_xdokb")
