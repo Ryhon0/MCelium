@@ -17,6 +17,7 @@ SkinViewer = NodePath("TabContainer/Skins/VBoxContainer/SkinViewer")
 MSAPopupScene = ExtResource("2_nf5o2")
 
 [node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -25,18 +26,14 @@ grow_vertical = 2
 tab_alignment = 1
 
 [node name="Instances" type="VBoxContainer" parent="TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="Skins" type="HBoxContainer" parent="TabContainer"]
 visible = false
+layout_mode = 2
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
-offset_bottom = 105.0
+layout_mode = 2
 size_flags_horizontal = 3
 auto_height = true
 item_count = 1
@@ -45,15 +42,13 @@ item_0/text = "Upload skin"
 item_0/icon = ExtResource("2_a64cc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
-offset_left = 4.0
-offset_right = 4.0
-offset_bottom = 105.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
 [node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("3_vs1tt")]
-offset_right = 0.0
-offset_bottom = 105.0
+layout_mode = 2
 
 [node name="MSA" parent="." instance=ExtResource("2_nf5o2")]
 visible = false
+layout_mode = 1

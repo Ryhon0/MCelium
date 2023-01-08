@@ -60,7 +60,7 @@ public partial class MSAPopup : VBoxContainer
 				if(authStatus.AccessToken == null)
 					RetryTimer.Start(devicecode.IntervalSec);
 			}
-			catch (HttpException ex)
+			catch (Exception ex)
 			{
 				RetryTimer.Start(devicecode.IntervalSec);
 				continue;

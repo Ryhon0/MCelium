@@ -29,12 +29,34 @@ public partial class Main : Control
 
 		if (false)
 		{
-			var s = await Modrinth.Search("horizons", new (string, string)[] { ("versions", "1.19.2") });
+			var s = await Modrinth.Search("inventory profiles", new (string, string)[] { ("versions", "1.19.2") });
 
-			foreach (var h in s.Hits)
+			var mod = s.Hits.First();
+			GD.Print($"{mod.Title} - https://modrinth.com/{mod.ProjectType}/{mod.Slug}");
+
+			var vers = await Modrinth.GetVersions(mod.ProjectID);
+			var v = vers.First(v => v.GameVersions.Contains("1.19.2")&&v.Loaders.Contains("fabric"));
+
+			var f = v.Files.First(f => f.Primary);
+			GD.Print("Download " + f.Url);
+
+			foreach (var d in v.Dependencies.Where(d => d.DependencyType == "required"))
 			{
-				GD.Print(h.Title + " - " + h.Slug);
-				GD.Print("https://modrinth.com/" + h.ProjectType + "/" + h.Slug);
+				if (d.VersionId != null)
+				{
+					var dver = await Modrinth.GetVersion(d.VersionId);
+
+					var df = dver.Files.First(f => f.Primary);
+					GD.Print("Download " + df.Url);
+				}
+				else
+				{
+					var dvers = await Modrinth.GetVersions(d.ProjectId);
+					var dver = dvers.First(dv=>dv.GameVersions.Contains("1.19.2")&&dv.Loaders.Contains("fabric"));
+
+					var df = dver.Files.First(f => f.Primary);
+					GD.Print("Download " + df.Url);
+				}
 			}
 		}
 
@@ -53,11 +75,14 @@ public partial class Main : Control
 			var xb = await MSA.XboxLogIn(rtr.AccessToken);
 			var mcxsts = await MSA.GetMinecraftXSTS(xb.Token);
 			var mcl = await Minecraft.LogIn(xb.UserHash, mcxsts);
+
+			/*
 			var mcp = await Minecraft.GetProfile(mcl.AccessToken);
-
 			SkinViewer.ShowSkin(mcp.Skins.FirstOrDefault(s => s.State == MinecraftSkin.StateActive));
-
 			GD.Print(mcp.Username);
+			*/
+		
+			Play(mcl.AccessToken, mcl.UUID, xb.UserHash);
 		}
 		else
 		{

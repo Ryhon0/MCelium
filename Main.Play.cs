@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Archives.Tar;
+using System.IO;
+using System.Diagnostics;
 
 public partial class Main
 {
-	async void Play()
+	async void Play(string token, string uuid, string xuid)
 	{
 		var manifest = await MinecraftLauncher.GetManifest();
-		var version = manifest.Versions.First(v => v.Id == "1.18.2");
-		string mcdir = ".minecraft/" + version + "/";
+		var version = manifest.Versions.First(v => v.Id == "1.19.2");
+		string mcdir = ".minecraft/" + version.Id + "/";
 
 		string osName = "linux";
 		string osVersion = null;
@@ -27,7 +29,12 @@ public partial class Main
 		{
 			var assetIndex = meta.AssetIndex;
 
-			var objects = (await MinecraftLauncher.GetAssetIndex(meta.AssetIndex.URL)).Objects;
+			var index = await MinecraftLauncher.GetAssetIndex(meta.AssetIndex.URL);
+			var objects = index.Objects;
+
+			System.IO.Directory.CreateDirectory(mcdir + "assets/indexes");
+			await System.IO.File.WriteAllTextAsync(mcdir + "assets/indexes/"+assetIndex.Id+".json",
+				JsonSerializer.Serialize(index));
 
 			var toDownload = objects.Where(o =>
 			{
@@ -64,8 +71,10 @@ public partial class Main
 				var fi = new System.IO.FileInfo(outpath);
 				System.IO.Directory.CreateDirectory(fi.DirectoryName);
 
-				var res = await this.Get(url, new string[] { });
-				await System.IO.File.WriteAllBytesAsync(outpath, res);
+				var res = await new RequestBuilder(url).Get<Stream>();
+				var f = System.IO.File.OpenWrite(outpath);
+				await res.CopyToAsync(f);
+				f.Close();
 
 				dlProgress += res.Length;
 				var precentage = ((dlProgress / (float)dlSize) * 100).ToString("0.0");
@@ -87,14 +96,15 @@ public partial class Main
 				var fi = new System.IO.FileInfo(outpath);
 				System.IO.Directory.CreateDirectory(fi.DirectoryName);
 
-				var jar = (await this.Get(url, new string[] { }));
-				await System.IO.File.WriteAllBytesAsync(outpath, jar);
+				var jar = await new RequestBuilder(url).Get<Stream>();
+				var f = System.IO.File.OpenWrite(outpath);
+				jar.CopyTo(f);
+				f.Close();
 			}
 
 			GD.Print("Done!");
 		}
 
-		if (false)
 		// Download libraries
 		{
 			GD.Print("Downloading libraries");
@@ -118,8 +128,10 @@ public partial class Main
 					var fi = new System.IO.FileInfo(outpath);
 					System.IO.Directory.CreateDirectory(fi.DirectoryName);
 
-					var dat = (await this.Get(dlurl, new string[] { }));
-					await System.IO.File.WriteAllBytesAsync(outpath, dat);
+					var dat = await new RequestBuilder(dlurl).Get<Stream>();
+					var f = System.IO.File.OpenWrite(outpath);
+					await dat.CopyToAsync(f);
+					f.Close();
 				}
 
 				// 1.19 seems to stop including it
@@ -135,10 +147,8 @@ public partial class Main
 
 						var url = classifier.Url;
 						// Java users try not to use .jar for everything challenge (impossible)
-						var jar = (await this.Get(url, new string[] { }));
-
-						var stream = new System.IO.MemoryStream(jar);
-						var zip = ZipArchive.Open(stream);
+						var jar = await new RequestBuilder(url).Get<Stream>();
+						var zip = ZipArchive.Open(jar);
 
 						foreach (var e in zip.Entries)
 						{
@@ -182,7 +192,8 @@ public partial class Main
 			var javaurl = $"https://api.adoptium.net/v3/assets/latest/{javaVersion}/hotspot?os={os}&architecture={arch}&image_type=jre";
 
 			GD.Print(javaurl);
-			var adoptiumjson = JSON.ParseString((await this.Get(javaurl, new string[] { })).GetStringFromUTF8()).AsGodotArray()[0].AsGodotDictionary();
+			var jstr = await new RequestBuilder(javaurl).Get<string>();
+			var adoptiumjson = JSON.ParseString(jstr).AsGodotArray()[0].AsGodotDictionary();
 			var dlurl = (string)adoptiumjson["binary"].AsGodotDictionary()["package"].AsGodotDictionary()["link"];
 			GD.Print(dlurl);
 
@@ -253,7 +264,61 @@ public partial class Main
 			args.AddRange(ProcessArguments(meta.Arguments.JVM, jvmkeys).ToList());
 			args.AddRange(ProcessArguments(meta.Arguments.Game, gamekeys).ToList());
 
-			GD.Print(string.Join(" ", args));
+			//GD.Print(string.Join(" ", args));
+		}
+
+		{
+		List<string> jars = new();
+		
+
+			var psi = new ProcessStartInfo()
+			{
+				FileName = "java",
+				ArgumentList = 
+				{
+					"-Xms1024m",
+					"-Xmx4096m",
+					"-Duser.language=en",
+
+					// Temporary. Could be very dangerous
+					"-cp", String.Join(':', System.IO.Directory.GetFileSystemEntries(mcdir, "*.jar", SearchOption.AllDirectories)),
+					meta.MainClass,
+
+					"--accessToken", token,
+					"--uuid", uuid,
+					"--xuid", xuid,
+					"--username", "Ryhon_",
+					"--userType", "msa",
+					"--clientid", "minecraft",
+
+					"--version", meta.Id,
+					"--versionType","release",
+
+
+					"--gameDir", System.IO.Path.GetFullPath(mcdir),
+					"--assetsDir", System.IO.Path.GetFullPath(mcdir+"assets"),
+					"--assetIndex", "1.19"
+				},
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false
+			};
+			var p = new Process();
+
+			// GD.Print(String.Join(' ', psi.ArgumentList));
+			p.StartInfo = psi;
+			p.Start();
+			await p.WaitForExitAsync();
+
+			GD.Print(p.ExitCode);
+
+			var stout = await p.StandardOutput.ReadToEndAsync();
+			GD.Print(stout);
+
+			var sterr = await p.StandardError.ReadToEndAsync();
+			GD.Print(sterr);
+
+			DisplayServer.ClipboardSet(stout);
 		}
 	}
 

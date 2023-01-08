@@ -11,6 +11,8 @@ using System.Collections.Generic;
 
 public class RequestBuilder
 {
+	public static bool DebugPrint = false;
+
 	public string Url;
 	public Dictionary<string, string> QuerParameters = new();
 	public Dictionary<string, string> Headers = new();
@@ -83,6 +85,13 @@ public class RequestBuilder
 
 		var http = new HttpClient();
 		var r = await http.SendAsync(m);
+
+		if(DebugPrint)
+		{
+			Godot.GD.Print(r.StatusCode);
+			Godot.GD.Print(await r.Content.ReadAsStringAsync());
+			Godot.DisplayServer.ClipboardSet(await r.Content.ReadAsStringAsync());
+		}
 
 		if (typeof(T) == typeof(string))
 		{

@@ -100,6 +100,8 @@ public class MinecraftVersionMeta
 	public MinecraftJavaVersion JavaVersion { get; set; }
 	[JsonPropertyName("libraries")]
 	public List<MinecraftLibrary> Libraries { get; set; }
+	[JsonPropertyName("mainClass")]
+	public string MainClass { get; set; }
 }
 
 public class MinecraftArguments
