@@ -75,14 +75,14 @@ public partial class Main : Control
 			var xb = await MSA.XboxLogIn(rtr.AccessToken);
 			var mcxsts = await MSA.GetMinecraftXSTS(xb.Token);
 			var mcl = await Minecraft.LogIn(xb.UserHash, mcxsts);
+			var mcp = await Minecraft.GetProfile(mcl.AccessToken);
 
 			/*
-			var mcp = await Minecraft.GetProfile(mcl.AccessToken);
 			SkinViewer.ShowSkin(mcp.Skins.FirstOrDefault(s => s.State == MinecraftSkin.StateActive));
 			GD.Print(mcp.Username);
 			*/
 		
-			Play(mcl.AccessToken, mcl.UUID, xb.UserHash);
+			Play(mcl.AccessToken, mcp.UUID, xb.UserHash);
 		}
 		else
 		{

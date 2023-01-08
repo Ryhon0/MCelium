@@ -203,21 +203,10 @@ public partial class Main
 
 		// Launch
 		{
-			List<string> args = new() { "java", "-jar", "-Xms512m", "-Xmx4096m", "-Duser.language=en" };
+			List<string> args = new() { "-Xms512m", "-Xmx4096m", "-Duser.language=en" };
 
-			IEnumerable<string> ProcessArguments(
-				IEnumerable<JsonNode> nodes,
-				Dictionary<string, string> dict)
+			IEnumerable<string> ProcessArguments(IEnumerable<JsonNode> nodes)
 			{
-				string ReplaceDict(string s, Dictionary<string, string> d)
-				{
-					string ss = s;
-					foreach (var ds in d)
-						ss = ss.Replace("${" + ds.Key + "}", ds.Value);
-
-					return ss;
-				}
-
 				foreach (var n in nodes)
 				{
 					if (n is JsonObject o)
@@ -230,95 +219,71 @@ public partial class Main
 							if (vo is JsonArray a)
 							{
 								foreach (var ao in a)
-									yield return ReplaceDict((string)ao, dict);
+									yield return (string)ao;
 							}
-							else yield return ReplaceDict((string)vo, dict);
+							else yield return (string)vo;
 					}
-					else yield return ReplaceDict((string)n, dict);
+					else yield return (string)n;
 				}
 			}
 
-			Dictionary<string, string> jvmkeys = new()
+			Dictionary<string, string> replacekeys = new()
 			{
 				["auth_player_name"] = "Ryhon_",
 				["version_name"] = version.Id,
 				["game_directory"] = mcdir,
 				["assets_root"] = mcdir + "assets",
-				["assets_index_name"] = "1",
-				["auth_uuid"] = "0123456789abcdef",
-				["auth_access_token"] = "0123456789abcdef",
-				["clientid"] = "0123456789abcdef",
-				["auth_xuid"] = "0123456789abcdef",
-				["user_type"] = "mojang",
+				["assets_index_name"] = "1.19",
+				["auth_uuid"] = uuid,
+				["auth_access_token"] = token,
+				["clientid"] = "minecraft",
+				["auth_xuid"] = xuid,
+				["user_type"] = "microsoft",
 				["version_type"] = version.VersionType,
-			};
-
-			Dictionary<string, string> gamekeys = new()
-			{
 				["natives_directory"] = mcdir + "natives",
 				["launcher_name"] = "MCelium",
 				["launcher_version"] = "0.0.1",
-				["classpath"] = "some.jar" + ":" + mcdir + "client.jar"
+				["classpath"] = String.Join(':', System.IO.Directory.GetFileSystemEntries(mcdir, "*.jar", SearchOption.AllDirectories))
 			};
 
-			args.AddRange(ProcessArguments(meta.Arguments.JVM, jvmkeys).ToList());
-			args.AddRange(ProcessArguments(meta.Arguments.Game, gamekeys).ToList());
+			args.AddRange(ProcessArguments(meta.Arguments.JVM).ToList());
+			args.Add(meta.MainClass);
+			args.AddRange(ProcessArguments(meta.Arguments.Game).ToList());
 
-			//GD.Print(string.Join(" ", args));
-		}
+			string ReplaceDict(string s, Dictionary<string, string> d)
+				{
+					string ss = s;
+					foreach (var ds in d)
+						ss = ss.Replace("${" + ds.Key + "}", ds.Value);
 
-		{
-		List<string> jars = new();
-		
+					return ss;
+				}
+
+			for(int i=0; i<args.Count; i++)
+				args[i] = ReplaceDict(args[i], replacekeys);
 
 			var psi = new ProcessStartInfo()
 			{
 				FileName = "java",
-				ArgumentList = 
-				{
-					"-Xms1024m",
-					"-Xmx4096m",
-					"-Duser.language=en",
-
-					// Temporary. Could be very dangerous
-					"-cp", String.Join(':', System.IO.Directory.GetFileSystemEntries(mcdir, "*.jar", SearchOption.AllDirectories)),
-					meta.MainClass,
-
-					"--accessToken", token,
-					"--uuid", uuid,
-					"--xuid", xuid,
-					"--username", "Ryhon_",
-					"--userType", "msa",
-					"--clientid", "minecraft",
-
-					"--version", meta.Id,
-					"--versionType","release",
-
-
-					"--gameDir", System.IO.Path.GetFullPath(mcdir),
-					"--assetsDir", System.IO.Path.GetFullPath(mcdir+"assets"),
-					"--assetIndex", "1.19"
-				},
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false
 			};
-			var p = new Process();
 
-			// GD.Print(String.Join(' ', psi.ArgumentList));
+			for(int i=0; i<args.Count; i++)
+				psi.ArgumentList.Add(args[i]);
+
+			var p = new Process();
 			p.StartInfo = psi;
+
+			GD.Print("Starting...");
+			GD.Print(string.Join(' ', args));
 			p.Start();
 			await p.WaitForExitAsync();
+			GD.Print("Exited with code " + p.ExitCode);
 
-			GD.Print(p.ExitCode);
-
-			var stout = await p.StandardOutput.ReadToEndAsync();
-			GD.Print(stout);
-
-			var sterr = await p.StandardError.ReadToEndAsync();
-			GD.Print(sterr);
-
-			DisplayServer.ClipboardSet(stout);
+			GD.Print(p.StandardError.ReadToEnd());
+			GD.Print(p.StandardOutput.ReadToEnd());
 		}
 	}
 
