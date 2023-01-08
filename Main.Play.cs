@@ -35,7 +35,7 @@ public partial class Main
 			var objects = index.Objects;
 
 			System.IO.Directory.CreateDirectory(mcdir + "assets/indexes");
-			await System.IO.File.WriteAllTextAsync(mcdir + "assets/indexes/"+assetIndex.Id+".json",
+			await System.IO.File.WriteAllTextAsync(mcdir + "assets/indexes/" + assetIndex.Id + ".json",
 				JsonSerializer.Serialize(index));
 
 			var toDownload = objects.Where(o =>
@@ -188,11 +188,11 @@ public partial class Main
 		// Download Fabric
 		{
 			var loaders = await FabricMeta.GetLoaders(meta.Id);
-		
-			var l = loaders.First(l=>l.Loader.Stable);
+
+			var l = loaders.First(l => l.Loader.Stable);
 
 			// This is so awesome, thank you 😃
-			if(l.LauncherMeta.MainClass is JsonObject o)
+			if (l.LauncherMeta.MainClass is JsonObject o)
 				MainClass = (string)(o["client"]);
 			else MainClass = (string)l.LauncherMeta.MainClass;
 
@@ -206,7 +206,7 @@ public partial class Main
 					Url = "https://maven.fabricmc.net/"
 				};
 
-				var outfile = mcdir + "fabric/" + l.Name.Replace(':','-') + ".jar";
+				var outfile = mcdir + "fabric/" + l.Name.Replace(':', '-') + ".jar";
 
 				GD.Print(l.GetDownloadUrl());
 				var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
@@ -221,11 +221,11 @@ public partial class Main
 			// Libraries
 			async Task DownloadLibraries(List<FabricMetaLibrary> libs)
 			{
-				foreach(var l in libs)
+				foreach (var l in libs)
 				{
-					var outfile = mcdir + "fabric/" + l.Name.Replace(':','-') + ".jar";
+					var outfile = mcdir + "fabric/" + l.Name.Replace(':', '-') + ".jar";
 
-					if(File.Exists(outfile)) continue;
+					if (File.Exists(outfile)) continue;
 
 					GD.Print(l.Name);
 					var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
@@ -238,6 +238,78 @@ public partial class Main
 
 			await DownloadLibraries(l.LauncherMeta.Libraries.Client);
 			await DownloadLibraries(l.LauncherMeta.Libraries.Common);
+		}
+
+		// Download some mods
+		{
+			Directory.CreateDirectory(mcdir + "mods");
+
+			async Task DownloadMod(string query, string version, string loader)
+			{
+				var s = await Modrinth.Search(query, new (string, string)[] { ("versions", version), ("categories", loader) });
+
+				var mod = s.Hits.First();
+				// GD.Print($"{mod.Title} - https://modrinth.com/{mod.ProjectType}/{mod.Slug}");
+
+				var vers = await Modrinth.GetVersions(mod.ProjectID);
+				var v = vers.First(v => v.GameVersions.Contains(version) && v.Loaders.Contains(loader));
+
+				var f = v.Files.First(f => f.Primary);
+				GD.Print("Download " + f.Url);
+
+				var modout = mcdir + "mods/" + f.Filename;
+				if (!File.Exists(modout))
+				{
+					var ms = await new RequestBuilder(f.Url).Get<Stream>();
+					var mf = File.OpenWrite(modout);
+					await ms.CopyToAsync(mf);
+					mf.Close();
+				}
+
+				foreach (var d in v.Dependencies.Where(d => d.DependencyType == "required"))
+				{
+					if (d.VersionId != null)
+					{
+						var dver = await Modrinth.GetVersion(d.VersionId);
+
+						var df = dver.Files.First(f => f.Primary);
+						GD.Print("Download " + df.Url);
+
+						var depout = mcdir + "mods/" + df.Filename;
+
+						if (!File.Exists(depout))
+						{
+							var ds = await new RequestBuilder(f.Url).Get<Stream>();
+							var dmf = File.OpenWrite(depout);
+							await ds.CopyToAsync(dmf);
+							dmf.Close();
+						}
+					}
+					else
+					{
+						var dvers = await Modrinth.GetVersions(d.ProjectId);
+						var dver = dvers.First(dv => dv.GameVersions.Contains(version) && dv.Loaders.Contains(loader));
+
+						var df = dver.Files.First(f => f.Primary);
+
+						var depout = mcdir + "mods/" + df.Filename;
+
+						if (!File.Exists(depout))
+						{
+							var ds = await new RequestBuilder(f.Url).Get<Stream>();
+							var dmf = File.OpenWrite(depout);
+							await ds.CopyToAsync(dmf);
+							dmf.Close();
+						}
+					}
+				}
+			}
+
+			await DownloadMod("Sodium", "1.19.2", "fabric");
+			await DownloadMod("Lithium", "1.19.2", "fabric");
+			await DownloadMod("Iris Shaders", "1.19.2", "fabric");
+			await DownloadMod("Mod Menu", "1.19.2", "fabric");
+			await DownloadMod("Distant Horizons", "1.19.2", "fabric");
 		}
 
 		// Download Java
@@ -308,15 +380,15 @@ public partial class Main
 			args.AddRange(ProcessArguments(meta.Arguments.Game).ToList());
 
 			string ReplaceDict(string s, Dictionary<string, string> d)
-				{
-					string ss = s;
-					foreach (var ds in d)
-						ss = ss.Replace("${" + ds.Key + "}", ds.Value);
+			{
+				string ss = s;
+				foreach (var ds in d)
+					ss = ss.Replace("${" + ds.Key + "}", ds.Value);
 
-					return ss;
-				}
+				return ss;
+			}
 
-			for(int i=0; i<args.Count; i++)
+			for (int i = 0; i < args.Count; i++)
 				args[i] = ReplaceDict(args[i], replacekeys);
 
 			var psi = new ProcessStartInfo()
@@ -327,14 +399,13 @@ public partial class Main
 				UseShellExecute = false
 			};
 
-			for(int i=0; i<args.Count; i++)
+			for (int i = 0; i < args.Count; i++)
 				psi.ArgumentList.Add(args[i]);
 
 			var p = new Process();
 			p.StartInfo = psi;
 
 			GD.Print("Starting...");
-			GD.Print(string.Join(' ', args));
 			p.Start();
 			await p.WaitForExitAsync();
 			GD.Print("Exited with code " + p.ExitCode);
