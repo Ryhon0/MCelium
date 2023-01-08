@@ -25,6 +25,8 @@ public partial class Main
 
 		var meta = await MinecraftLauncher.GetVersionMeta(version.Url);
 
+		string MainClass = meta.MainClass;
+
 		// Download assets
 		{
 			var assetIndex = meta.AssetIndex;
@@ -183,6 +185,61 @@ public partial class Main
 			GD.Print("Done!");
 		}
 
+		// Download Fabric
+		{
+			var loaders = await FabricMeta.GetLoaders(meta.Id);
+		
+			var l = loaders.First(l=>l.Loader.Stable);
+
+			// This is so awesome, thank you 😃
+			if(l.LauncherMeta.MainClass is JsonObject o)
+				MainClass = (string)(o["client"]);
+			else MainClass = (string)l.LauncherMeta.MainClass;
+
+			Directory.CreateDirectory(mcdir + "fabric");
+
+			async Task DownloadLoader(FabricMetaLoaderInfo loader)
+			{
+				var l = new FabricMetaLibrary()
+				{
+					Name = loader.Maven,
+					Url = "https://maven.fabricmc.net/"
+				};
+
+				var outfile = mcdir + "fabric/" + l.Name.Replace(':','-') + ".jar";
+
+				GD.Print(l.GetDownloadUrl());
+				var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
+				var f = File.OpenWrite(outfile);
+				await s.CopyToAsync(f);
+				f.Close();
+			}
+
+			await DownloadLoader(l.Loader);
+			await DownloadLoader(l.Intermediary);
+
+			// Libraries
+			async Task DownloadLibraries(List<FabricMetaLibrary> libs)
+			{
+				foreach(var l in libs)
+				{
+					var outfile = mcdir + "fabric/" + l.Name.Replace(':','-') + ".jar";
+
+					if(File.Exists(outfile)) continue;
+
+					GD.Print(l.Name);
+					var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
+
+					var f = File.OpenWrite(outfile);
+					await s.CopyToAsync(f);
+					f.Close();
+				}
+			}
+
+			await DownloadLibraries(l.LauncherMeta.Libraries.Client);
+			await DownloadLibraries(l.LauncherMeta.Libraries.Common);
+		}
+
 		// Download Java
 		if (false)
 		{
@@ -247,7 +304,7 @@ public partial class Main
 			};
 
 			args.AddRange(ProcessArguments(meta.Arguments.JVM).ToList());
-			args.Add(meta.MainClass);
+			args.Add(MainClass);
 			args.AddRange(ProcessArguments(meta.Arguments.Game).ToList());
 
 			string ReplaceDict(string s, Dictionary<string, string> d)
