@@ -313,17 +313,17 @@ public partial class Main
 		}
 
 		// Download Java
-		if (false)
 		{
 			var javaVersion = meta.JavaVersion.MajorVersion;
 			string os = "linux";
 			string arch = "x64";
+
 			var javaurl = $"https://api.adoptium.net/v3/assets/latest/{javaVersion}/hotspot?os={os}&architecture={arch}&image_type=jre";
 
-			GD.Print(javaurl);
-			var jstr = await new RequestBuilder(javaurl).Get<string>();
+			var jstr = await Adoptium.GetJRE(os, arch, javaVersion);
 			var adoptiumjson = JSON.ParseString(jstr).AsGodotArray()[0].AsGodotDictionary();
 			var dlurl = (string)adoptiumjson["binary"].AsGodotDictionary()["package"].AsGodotDictionary()["link"];
+
 			GD.Print(dlurl);
 
 			// var tar = (await this.Get(dlurl, new string[] { })).result;
