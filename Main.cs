@@ -41,6 +41,8 @@ public partial class Main : Control
 		InstanceProperties.Hide();
 		InstanceList.Clear();
 
+		Java.LoadVersions();
+
 		Directory.CreateDirectory(Paths.Instances);
 		foreach (var d in Directory.GetDirectories(Paths.Instances))
 		{
@@ -109,6 +111,7 @@ public partial class Main : Control
 				string osVersion = null;
 				string archName = "x86";
 				List<string> features = new();
+			var java = Java.Versions.First(j=>j.MajorVersion == i.Meta.JavaVersion.MajorVersion).GetExecutable();
 
 				List<string> args = new() { "-Xms512m", "-Xmx4096m", "-Duser.language=en" };
 

@@ -1,10 +1,14 @@
 using Godot;
-using SharpCompress.Archives.Zip;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using SharpCompress.Common;
+using SharpCompress.Readers;
+using SharpCompress.Common.Tar;
+using System.Collections.Generic;
+using SharpCompress.Archives.Zip;
+
 
 public partial class NewInstance : ColorRect
 {
@@ -85,7 +89,7 @@ public partial class NewInstance : ColorRect
 			foreach (var d in toDownload)
 			{
 				string url = "http://resources.download.minecraft.net/" + d.Value.Hash[0..2] + "/" + d.Value.Hash;
-				var outpath = objectsdir +"/" + d.Value.Hash[0..2] + "/" + d.Value.Hash;
+				var outpath = objectsdir + "/" + d.Value.Hash[0..2] + "/" + d.Value.Hash;
 
 				GD.Print(d.Key);
 
@@ -133,27 +137,30 @@ public partial class NewInstance : ColorRect
 
 			foreach (var lib in meta.Libraries)
 			{
-				var outpath = mcdir + "/libs/" + lib.Downloads.Artifact.Path;
-				var dlurl = lib.Downloads.Artifact.Url;
-
-				if (lib.Rules != null)
+				if (lib.Downloads.Artifact != null)
 				{
-					var allow = !lib.Rules.Select(r => r.Allowed(osName, null, archName, features))
-						.Any(r => !r);
-					if (!allow) continue;
-				}
+					var outpath = mcdir + "/libs/" + lib.Downloads.Artifact.Path;
+					var dlurl = lib.Downloads.Artifact.Url;
 
-				if (!System.IO.File.Exists(outpath))
-				{
-					GD.Print(dlurl + " => " + outpath);
+					if (lib.Rules != null)
+					{
+						var allow = !lib.Rules.Select(r => r.Allowed(osName, null, archName, features))
+							.Any(r => !r);
+						if (!allow) continue;
+					}
 
-					var fi = new System.IO.FileInfo(outpath);
-					System.IO.Directory.CreateDirectory(fi.DirectoryName);
+					if (!System.IO.File.Exists(outpath))
+					{
+						GD.Print(dlurl + " => " + outpath);
 
-					var dat = await new RequestBuilder(dlurl).Get<Stream>();
-					var f = System.IO.File.OpenWrite(outpath);
-					await dat.CopyToAsync(f);
-					f.Close();
+						var fi = new System.IO.FileInfo(outpath);
+						System.IO.Directory.CreateDirectory(fi.DirectoryName);
+
+						var dat = await new RequestBuilder(dlurl).Get<Stream>();
+						var f = System.IO.File.OpenWrite(outpath);
+						await dat.CopyToAsync(f);
+						f.Close();
+					}
 				}
 
 				// 1.18 seems to stop including it
@@ -202,8 +209,86 @@ public partial class NewInstance : ColorRect
 			}
 		}
 
+		// Download Java
+		{
+			// Check if a matching major Java version is already installed 
+			if(!Java.Versions.Any(v=>v.MajorVersion == meta.JavaVersion.MajorVersion))
+			{
+				// Unlike the launcher, architecture bitness matters
+				var javaArch = "x64";
+
+				var a = (await Adoptium.GetJRE(osName, javaArch, meta.JavaVersion.MajorVersion)).First();
+
+				var javaname = a.ReleaseName + "-jre";
+				var javadir = Paths.Java + "/" + javaname;
+				Directory.CreateDirectory(javadir);
+
+				var tarstream = await new RequestBuilder(a.Binary.Package.Link).Get<Stream>();
+				var r = ReaderFactory.Open(tarstream);
+
+				var eo = new ExtractionOptions()
+				{
+					Overwrite = true,
+					WriteSymbolicLink = (source, target) =>
+					{
+						File.CreateSymbolicLink(source, target);
+					}
+				};
+
+				while(r.MoveToNextEntry())
+				{
+					var e = r.Entry;
+					if(e.IsDirectory) continue;
+					
+					var k = e.Key;
+
+					if(e.Key.StartsWith(javaname))
+						k = k[(javaname.Length+1)..];
+
+					var outdir = javadir + "/" + k;
+					Directory.CreateDirectory(Path.GetDirectoryName(outdir));
+					GD.Print(outdir);
+
+					r.WriteEntryToFile(outdir, eo);
+
+					// This is awful but Mono Unix syscalls didn't work
+					if(e is TarEntry te)
+					{
+						string PermissionString(long perms)
+						{
+							string s = "";
+							for(int i=0;i<3;i++)
+							{
+								var p = (perms >> (i*3)) & 0b111;
+								s = p.ToString() + s;
+							}
+							return s;
+						}
+
+						var p = new System.Diagnostics.Process();
+						p.StartInfo = new System.Diagnostics.ProcessStartInfo()
+						{
+							FileName ="chmod",
+							UseShellExecute = false,
+							Arguments = PermissionString(te.Mode) + " " + outdir
+						};
+						GD.Print(p.StartInfo.Arguments);
+						p.Start();
+						await p.WaitForExitAsync();
+					}
+				}
+
+				var java = new Java()
+				{
+					Release = javaname,
+					MajorVersion = meta.JavaVersion.MajorVersion
+				};
+				await File.WriteAllTextAsync(javadir + "/" + Java.InfoFile, JsonSerializer.Serialize(java));
+			}
+		}
+
 		await File.WriteAllTextAsync(instancefile, JsonSerializer.Serialize(instance));
-	
+
 		GetTree().ReloadCurrentScene();
 	}
 }

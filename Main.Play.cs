@@ -313,6 +313,7 @@ public partial class Main
 		}
 
 		// Download Java
+		/*
 		{
 			var javaVersion = meta.JavaVersion.MajorVersion;
 			string os = "linux";
@@ -326,6 +327,7 @@ public partial class Main
 
 			// var tar = (await this.Get(dlurl, new string[] { })).result;
 		}
+		*/
 
 
 		// Launch
