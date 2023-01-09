@@ -1,11 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://bf185tungtrvy"]
+[gd_scene load_steps=7 format=3 uid="uid://cpgnhx5qvpla5"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_si5fj"]
 [ext_resource type="Texture2D" uid="uid://ruc4bld6bxiw" path="res://UI/plus.svg" id="2_a64cc"]
-[ext_resource type="PackedScene" uid="uid://ttcpf4vfptq7" path="res://MSAPopup.tscn" id="2_nf5o2"]
-[ext_resource type="PackedScene" uid="uid://cbny488yapva0" path="res://SkinViewer.tscn" id="3_vs1tt"]
+[ext_resource type="PackedScene" uid="uid://damyjf5ocy73i" path="res://UI/MSAPopup/MSAPopup.tscn" id="2_c56ui"]
+[ext_resource type="Texture2D" uid="uid://n1o2m71jd1ke" path="res://icon.svg" id="3_f1rbh"]
+[ext_resource type="PackedScene" uid="uid://bn8d3uovssa5k" path="res://UI/NewInstance/NewInstance.tscn" id="3_sakc4"]
+[ext_resource type="PackedScene" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_kgj02"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("SkinViewer")]
+[node name="Main" type="Control" node_paths=PackedStringArray("SkinViewer", "InstanceList", "InstanceProperties")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,10 +16,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_si5fj")
 SkinViewer = NodePath("TabContainer/Skins/VBoxContainer/SkinViewer")
-MSAPopupScene = ExtResource("2_nf5o2")
+InstanceList = NodePath("TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList")
+InstanceProperties = NodePath("TabContainer/Instances/HSplitContainer/InstanceProperties")
+MSAPopupScene = ExtResource("2_c56ui")
+NewInstanceScene = ExtResource("3_sakc4")
+NewInstanceIcon = ExtResource("2_a64cc")
+DefaultInstanceIcon = ExtResource("3_f1rbh")
 
 [node name="TabContainer" type="TabContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,14 +32,56 @@ grow_vertical = 2
 tab_alignment = 1
 
 [node name="Instances" type="VBoxContainer" parent="TabContainer"]
-layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+
+[node name="HSplitContainer" type="HSplitContainer" parent="TabContainer/Instances"]
+offset_right = 1152.0
+offset_bottom = 617.0
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Instances/HSplitContainer"]
+custom_minimum_size = Vector2(148, 0)
+offset_right = 890.0
+offset_bottom = 617.0
+size_flags_horizontal = 3
+
+[node name="InstanceList" type="ItemList" parent="TabContainer/Instances/HSplitContainer/ScrollContainer"]
+custom_minimum_size = Vector2(128, 0)
+offset_right = 890.0
+offset_bottom = 617.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+item_count = 3
+max_columns = 1024
+same_column_width = true
+icon_mode = 0
+fixed_icon_size = Vector2i(128, 128)
+item_0/text = "1.19.2"
+item_0/icon = ExtResource("3_f1rbh")
+item_1/text = "1.20"
+item_1/icon = ExtResource("3_f1rbh")
+item_2/text = "New instance"
+item_2/icon = ExtResource("2_a64cc")
+
+[node name="InstanceProperties" type="VBoxContainer" parent="TabContainer/Instances/HSplitContainer"]
+custom_minimum_size = Vector2(250, 0)
+offset_left = 902.0
+offset_right = 1152.0
+offset_bottom = 617.0
+
+[node name="Label" type="Label" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
+offset_right = 250.0
+offset_bottom = 26.0
+text = "Minecraft Java 1.19.2"
+horizontal_alignment = 1
 
 [node name="Skins" type="HBoxContainer" parent="TabContainer"]
 visible = false
-layout_mode = 2
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
-layout_mode = 2
 size_flags_horizontal = 3
 auto_height = true
 item_count = 1
@@ -42,13 +90,9 @@ item_0/text = "Upload skin"
 item_0/icon = ExtResource("2_a64cc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
-layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("3_vs1tt")]
-layout_mode = 2
+[node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("5_kgj02")]
 
-[node name="MSA" parent="." instance=ExtResource("2_nf5o2")]
-visible = false
-layout_mode = 1
+[connection signal="item_activated" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceActivated"]

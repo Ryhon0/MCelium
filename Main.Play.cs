@@ -318,8 +318,6 @@ public partial class Main
 			string os = "linux";
 			string arch = "x64";
 
-			var javaurl = $"https://api.adoptium.net/v3/assets/latest/{javaVersion}/hotspot?os={os}&architecture={arch}&image_type=jre";
-
 			var jstr = await Adoptium.GetJRE(os, arch, javaVersion);
 			var adoptiumjson = JSON.ParseString(jstr).AsGodotArray()[0].AsGodotDictionary();
 			var dlurl = (string)adoptiumjson["binary"].AsGodotDictionary()["package"].AsGodotDictionary()["link"];

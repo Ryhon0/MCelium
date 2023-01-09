@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -20,7 +21,6 @@ public partial class MSAPopup : VBoxContainer
 
 	const string OAuthScopes = "XboxLive.signin offline_access";
 	string Clientid = "b26b832c-d001-4dd0-943c-fcc3fd812964";
-	const string ProfilePath = "user://profile.json";
 
 	string AuthPageURL;
 
@@ -104,28 +104,21 @@ public partial class MSAPopup : VBoxContainer
 		Tabs.CurrentTab = LoggedInPage.GetIndex();
 		UsernameLabel.Text = profile.Username;
 
-		var p = new MCLProfile()
+		var p = new Profile()
 		{
-			Profile = profile,
-			MSARefreshToken = authStatus.RefreshToken
+			MCProfile = profile,
+			MSARefreshToken = authStatus.RefreshToken,
+			Xuid = xbox.UserHash,
+			MCToken = mclogin.AccessToken,
+			MCTokenExpiresIn = DateTime.Now.AddSeconds(mclogin.ExpiresInSeconds)
 		};
 
-		var pj = System.Text.Json.JsonSerializer.Serialize(p);
-		{
-			var f = Godot.FileAccess.Open(ProfilePath, Godot.FileAccess.ModeFlags.Write);
-			f.StoreString(pj);
-			f = null;
-		}
+		var pj = System.Text.Json.JsonSerializer.Serialize(new List<Profile>(){p});
+		await File.WriteAllTextAsync(Paths.Profiles, pj);
 	}
 
 	void OpenAuthPage()
 	{
 		OS.ShellOpen(AuthPageURL);
 	}
-}
-
-public class MCLProfile
-{
-	public MinecraftProfile Profile {get;set;}
-	public string MSARefreshToken {get;set;}
 }

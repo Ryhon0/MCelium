@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System;
 
 public static class FabricMeta
 {
@@ -23,7 +24,7 @@ public static class FabricMeta
 public class FabricMetaGameVersion
 {
 	[JsonPropertyName("version")]
-	public string Version {get;set;}
+	public Version Version {get;set;}
 
 	[JsonPropertyName("stable")]
 	public bool Stable {get;set;}

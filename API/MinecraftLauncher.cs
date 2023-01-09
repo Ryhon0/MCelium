@@ -73,7 +73,7 @@ public class MinecraftAssetIndexInfo
 	[JsonPropertyName("id")]
 	public string Id { get; set; }
 	[JsonPropertyName("sha1")]
-	public string Sha1 { get; set; }
+	public byte[] Sha1 { get; set; }
 	[JsonPropertyName("size")]
 	public long Size { get; set; }
 	[JsonPropertyName("totalSize")]
@@ -127,7 +127,7 @@ public class MinecraftDownloads
 public class MinecraftDownload
 {
 	[JsonPropertyName("sha1")]
-	public string Sha1 { get; set; }
+	public byte[] Sha1 { get; set; }
 	[JsonPropertyName("size")]
 	public long Size { get; set; }
 	[JsonPropertyName("url")]
