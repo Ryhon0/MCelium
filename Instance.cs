@@ -1,9 +1,52 @@
 using System;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 public class Instance
 {
 	public static string InstanceFile = "instance.json";
+
+	public static async Task<List<Instance>> LoadInstances()
+	{
+		var ins = new List<Instance>();
+
+		Directory.CreateDirectory(Paths.Instances);
+		foreach (var d in Directory.GetDirectories(Paths.Instances))
+		{
+			var jsonfile = d + "/" + InstanceFile;
+			if (!File.Exists(jsonfile)) continue;
+
+			Instance i = null;
+			try
+			{
+				i = JsonSerializer.Deserialize<Instance>(await System.IO.File.ReadAllTextAsync(jsonfile));
+			}
+			catch (JsonException je)
+			{
+				// Invalid JSON, skip instance
+				continue;
+			}
+
+			ins.Add(i);
+		}
+
+		return ins;
+	}
+
+	public async Task Save()
+	{
+		var instdir = GetDirectory();
+		Directory.CreateDirectory(instdir);
+		await File.WriteAllTextAsync(instdir + "/" + InstanceFile, JsonSerializer.Serialize(this));
+	}
+
+	public string GetDirectory()
+		=> Paths.Instances + "/" + Id;
+
+	public string GetMinecraftDirectory()
+		=> Paths.Instances + "/" + Id + "/.minecraft";
 
 	public string Name { get; set; }
 	public string Id { get; set; }

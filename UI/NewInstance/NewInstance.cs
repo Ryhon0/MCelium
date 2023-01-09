@@ -39,11 +39,10 @@ public partial class NewInstance : ColorRect
 		};
 		GD.Print(v.Id);
 
-		var objectsdir = Paths.Assets + "/objects";
-		var indexesdir = Paths.Assets + "/indexes";
-		var instancedir = Paths.Instances + "/" + v.Id;
-		var instancefile = Paths.Instances + "/" + v.Id + "/" + Instance.InstanceFile;
-		var mcdir = Paths.Instances + "/" + v.Id + "/.minecraft";
+		var objectsdir = Paths.AssetsObjects;
+		var indexesdir = Paths.AssetsIndexes;
+		var instancedir = instance.GetDirectory();
+		var mcdir = instance.GetMinecraftDirectory();
 
 		Directory.CreateDirectory(objectsdir);
 		Directory.CreateDirectory(mcdir);
@@ -223,7 +222,13 @@ public partial class NewInstance : ColorRect
 				var a = (await Adoptium.GetJRE(osName, javaArch, meta.JavaVersion.MajorVersion)).First();
 
 				var javaname = a.ReleaseName + "-jre";
-				var javadir = Paths.Java + "/" + javaname;
+				var java = new Java()
+				{
+					Release = javaname,
+					MajorVersion = meta.JavaVersion.MajorVersion
+				};
+
+				var javadir = java.GetDirectory();
 				Directory.CreateDirectory(javadir);
 
 				var tarstream = await new RequestBuilder(a.Binary.Package.Link).Get<Stream>();
@@ -281,16 +286,11 @@ public partial class NewInstance : ColorRect
 					}
 				}
 
-				var java = new Java()
-				{
-					Release = javaname,
-					MajorVersion = meta.JavaVersion.MajorVersion
-				};
-				await File.WriteAllTextAsync(javadir + "/" + Java.InfoFile, JsonSerializer.Serialize(java));
+				await java.Save();
 			}
 		}
 
-		await File.WriteAllTextAsync(instancefile, JsonSerializer.Serialize(instance));
+		await instance.Save();
 
 		GetTree().ReloadCurrentScene();
 	}

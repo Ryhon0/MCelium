@@ -43,40 +43,19 @@ public partial class Main : Control
 		InstanceProperties.Hide();
 		InstanceList.Clear();
 
-		Java.LoadVersions();
-
-		Directory.CreateDirectory(Paths.Instances);
-		foreach (var d in Directory.GetDirectories(Paths.Instances))
-		{
-			var jsonfile = d + "/" + Instance.InstanceFile;
-			if (!File.Exists(jsonfile)) continue;
-
-			var jsonstr = await System.IO.File.ReadAllBytesAsync(jsonfile);
-
-			Instance i = null;
-			try
-			{
-				i = JsonSerializer.Deserialize<Instance>(jsonstr);
-			}
-			catch (JsonException je)
-			{
-				// Invalid JSON, skip instance
-				continue;
-			}
-
-			Instances.Add(i);
-		}
+		Java.Versions = await Java.LoadVersions();
+		Instances = await Instance.LoadInstances();
 
 		foreach (var i in Instances)
 		{
 			var id = InstanceList.AddIconItem(DefaultInstanceIcon);
 			InstanceList.SetItemText(id, i.Name);
 		}
-
 		{
 			var id = InstanceList.AddIconItem(NewInstanceIcon);
 			InstanceList.SetItemText(id, "New instance");
 		}
+		InstanceList.GrabFocus();
 
 		if (File.Exists(Paths.Profiles))
 		{
@@ -165,7 +144,7 @@ public partial class Main : Control
 				}
 			}
 
-			var mcdir = Paths.Instances + "/" + i.Version.Id + "/.minecraft";
+			var mcdir = i.GetMinecraftDirectory();
 			Dictionary<string, string> replacekeys = new()
 			{
 				["auth_player_name"] = p.MCProfile.Username,
