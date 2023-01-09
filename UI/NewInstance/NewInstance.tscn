@@ -1,8 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://bn8d3uovssa5k"]
+[gd_scene load_steps=3 format=3 uid="uid://bn8d3uovssa5k"]
 
 [ext_resource type="Script" path="res://UI/NewInstance/NewInstance.cs" id="1_xvi3p"]
+[ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="2_ykja3"]
 
-[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton")]
+[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "InfoLabel", "SubInfoLabel")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,8 +12,13 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_xvi3p")
 VersionButton = NodePath("CenterContainer/VBoxContainer/OptionButton")
+InstallPage = NodePath("CenterContainer/VBoxContainer")
+ProgressPage = NodePath("CenterContainer/ProgressPage")
+InfoLabel = NodePath("CenterContainer/ProgressPage/Info")
+SubInfoLabel = NodePath("CenterContainer/ProgressPage/Subinfo")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -21,25 +27,42 @@ grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 custom_minimum_size = Vector2(200, 0)
-offset_left = 476.0
-offset_top = 281.0
-offset_right = 676.0
-offset_bottom = 366.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
-offset_right = 200.0
-offset_bottom = 26.0
+layout_mode = 2
 text = "Version"
 
 [node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
-offset_top = 30.0
-offset_right = 200.0
-offset_bottom = 50.0
+layout_mode = 2
 
 [node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
-offset_top = 54.0
-offset_right = 200.0
-offset_bottom = 85.0
+layout_mode = 2
 text = "Download"
+
+[node name="ProgressPage" type="VBoxContainer" parent="CenterContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Info" type="Label" parent="CenterContainer/ProgressPage"]
+layout_mode = 2
+text = "Downloading"
+horizontal_alignment = 1
+
+[node name="Subinfo" type="Label" parent="CenterContainer/ProgressPage"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="CenterContainer/ProgressPage"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="CenterContainer/ProgressPage/CenterContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="Spinner" parent="CenterContainer/ProgressPage/CenterContainer/Control" instance=ExtResource("2_ykja3")]
+position = Vector2(32, 32)
+rotation = 27384.6
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="." method="Download"]

@@ -14,6 +14,10 @@ public partial class NewInstance : ColorRect
 {
 	[Export]
 	OptionButton VersionButton;
+	[Export]
+	Control InstallPage, ProgressPage;
+	[Export]
+	Label InfoLabel, SubInfoLabel;
 
 	MinecraftManifest Manifest;
 
@@ -28,6 +32,11 @@ public partial class NewInstance : ColorRect
 
 	async void Download()
 	{
+		InstallPage.Hide();
+		ProgressPage.Show();
+
+		InfoLabel.Text = "Getting metadata";
+
 		var v = Manifest.Versions[VersionButton.Selected];
 		var meta = await MinecraftLauncher.GetVersionMeta(v.Url);
 		var instance = new Instance()
@@ -47,6 +56,7 @@ public partial class NewInstance : ColorRect
 		Directory.CreateDirectory(objectsdir);
 		Directory.CreateDirectory(mcdir);
 
+		InfoLabel.Text = "Getting asset index";
 		// Download assets
 		{
 			var assetIndex = meta.AssetIndex;
@@ -61,6 +71,7 @@ public partial class NewInstance : ColorRect
 					JsonSerializer.Serialize(index));
 			}
 
+			InfoLabel.Text = "Downloading assets";
 			var toDownload = objects.Where(o =>
 			{
 				var v = o.Value;
@@ -83,14 +94,16 @@ public partial class NewInstance : ColorRect
 
 			long dlSize = toDownload.Sum(d => d.Value.Size);
 			long dlProgress = 0;
-			GD.Print("Downloading " + toDownload.Count + " objects... (" + dlSize.BytesToString() + ")");
+
+			InfoLabel.Text = $"Downloading assets (0B/{dlSize.BytesToString()}, 0%)" ;
+
 			// https://wiki.vg/Game_files
 			foreach (var d in toDownload)
 			{
 				string url = "http://resources.download.minecraft.net/" + d.Value.Hash[0..2] + "/" + d.Value.Hash;
 				var outpath = objectsdir + "/" + d.Value.Hash[0..2] + "/" + d.Value.Hash;
 
-				GD.Print(d.Key);
+				SubInfoLabel.Text = d.Key;
 
 				var fi = new System.IO.FileInfo(outpath);
 				System.IO.Directory.CreateDirectory(fi.DirectoryName);
@@ -102,13 +115,15 @@ public partial class NewInstance : ColorRect
 
 				dlProgress += res.Length;
 				var precentage = ((dlProgress / (float)dlSize) * 100).ToString("0.0");
-				GD.Print($"{dlProgress.BytesToString()}/{dlSize.BytesToString()} - {precentage}%");
+			
+				InfoLabel.Text = $"Downloading assets ({dlProgress.BytesToString()}/{dlSize.BytesToString()}, {precentage}%)" ;
 			}
 		}
 
 		// Download client jar
 		{
-			GD.Print("Downloading client.jar");
+			InfoLabel.Text = "Downloading client";
+			SubInfoLabel.Text = "";
 
 			var url = meta.Downloads.Client.Url;
 
@@ -132,12 +147,14 @@ public partial class NewInstance : ColorRect
 
 		// Download libraries
 		{
-			GD.Print("Downloading libraries");
+			InfoLabel.Text = "Downloading libraries";
+			SubInfoLabel.Text = "";
 
 			foreach (var lib in meta.Libraries)
 			{
 				if (lib.Downloads.Artifact != null)
 				{
+
 					var outpath = mcdir + "/libs/" + lib.Downloads.Artifact.Path;
 					var dlurl = lib.Downloads.Artifact.Url;
 
@@ -150,7 +167,7 @@ public partial class NewInstance : ColorRect
 
 					if (!System.IO.File.Exists(outpath))
 					{
-						GD.Print(dlurl + " => " + outpath);
+						SubInfoLabel.Text = outpath.Split('/').Last();
 
 						var fi = new System.IO.FileInfo(outpath);
 						System.IO.Directory.CreateDirectory(fi.DirectoryName);
@@ -172,6 +189,8 @@ public partial class NewInstance : ColorRect
 						if (lib.Downloads.Classifiers.ContainsKey(classifiersName))
 						{
 							var classifier = lib.Downloads.Classifiers[classifiersName];
+
+							SubInfoLabel.Text = classifier.Path.Split('/').Last();
 
 							var url = classifier.Url;
 							// Java users try not to use .jar for everything challenge (impossible)
@@ -211,6 +230,9 @@ public partial class NewInstance : ColorRect
 			}
 		}
 
+		InfoLabel.Text = "Downloading Java";
+		SubInfoLabel.Text = "";
+
 		// Download Java
 		{
 			// Check if a matching major Java version is already installed 
@@ -220,6 +242,8 @@ public partial class NewInstance : ColorRect
 				var javaArch = "x64";
 
 				var a = (await Adoptium.GetJRE(osName, javaArch, meta.JavaVersion.MajorVersion)).First();
+
+				SubInfoLabel.Text = a.ReleaseName;
 
 				var javaname = a.ReleaseName + "-jre";
 				var java = new Java()
