@@ -170,39 +170,42 @@ public partial class NewInstance : ColorRect
 					if (natives.ContainsKey(osName))
 					{
 						var classifiersName = (string)natives[osName];
-						var classifier = lib.Downloads.Classifiers[classifiersName];
-
-						var url = classifier.Url;
-						// Java users try not to use .jar for everything challenge (impossible)
-						var jar = await new RequestBuilder(url).Get<Stream>();
-						var zip = ZipArchive.Open(jar);
-
-						foreach (var e in zip.Entries)
+						if (lib.Downloads.Classifiers.ContainsKey(classifiersName))
 						{
-							if (e.IsDirectory) continue;
+							var classifier = lib.Downloads.Classifiers[classifiersName];
 
-							bool exclude = false;
-							if (lib.ExtractExclude != null)
-								foreach (var ex in lib.ExtractExclude)
-								{
-									if (e.Key.StartsWith(ex))
+							var url = classifier.Url;
+							// Java users try not to use .jar for everything challenge (impossible)
+							var jar = await new RequestBuilder(url).Get<Stream>();
+							var zip = ZipArchive.Open(jar);
+
+							foreach (var e in zip.Entries)
+							{
+								if (e.IsDirectory) continue;
+
+								bool exclude = false;
+								if (lib.ExtractExclude != null)
+									foreach (var ex in lib.ExtractExclude)
 									{
-										exclude = true;
-										continue;
+										if (e.Key.StartsWith(ex))
+										{
+											exclude = true;
+											continue;
+										}
 									}
-								}
-							if (exclude) continue;
+								if (exclude) continue;
 
-							GD.Print("Extracting " + e.Key);
-							var outdir = mcdir + "/natives/" + e.Key;
+								GD.Print("Extracting " + e.Key);
+								var outdir = mcdir + "/natives/" + e.Key;
 
-							var fi = new System.IO.FileInfo(outdir);
-							System.IO.Directory.CreateDirectory(fi.DirectoryName);
+								var fi = new System.IO.FileInfo(outdir);
+								System.IO.Directory.CreateDirectory(fi.DirectoryName);
 
-							var s = e.OpenEntryStream();
-							var f = System.IO.File.Open(outdir, System.IO.FileMode.Create);
-							await s.CopyToAsync(f);
-							f.Close();
+								var s = e.OpenEntryStream();
+								var f = System.IO.File.Open(outdir, System.IO.FileMode.Create);
+								await s.CopyToAsync(f);
+								f.Close();
+							}
 						}
 					}
 				}

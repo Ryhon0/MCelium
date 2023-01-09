@@ -86,6 +86,9 @@ public class MinecraftVersionMeta
 {
 	[JsonPropertyName("arguments")]
 	public MinecraftArguments Arguments { get; set; }
+	[JsonPropertyName("minecraftArguments")]
+	/// Used by older versions of Minecraft. Use this instead of Arguments when not null
+	public string MinecraftArguments { get; set; }
 	[JsonPropertyName("assetIndex")]
 	public MinecraftAssetIndexInfo AssetIndex { get; set; }
 	[JsonPropertyName("assets")]
