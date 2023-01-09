@@ -1,6 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://cbny488yapva0"]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://SkinViewer.cs" id="1_g1o6a"]
+[ext_resource type="Script" path="res://UI/SkinViewer/SkinViewer.cs" id="1_g1o6a"]
 [ext_resource type="PackedScene" uid="uid://62cjsn2ruii5" path="res://Models/player_rigged.glb" id="1_o0lkl"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lsegj"]

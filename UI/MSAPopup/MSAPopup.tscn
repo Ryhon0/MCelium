@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://ttcpf4vfptq7"]
+[gd_scene load_steps=9 format=3 uid="uid://damyjf5ocy73i"]
 
 [ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="1_nc4mq"]
-[ext_resource type="Script" path="res://MSAPopup.cs" id="1_yllhe"]
+[ext_resource type="Script" path="res://UI/MSAPopup/MSAPopup.cs" id="1_yllhe"]
 [ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://UI/circle_empty.svg" id="2_7d2w4"]
-[ext_resource type="Script" path="res://TimerProgressBar.cs" id="3_bgjbm"]
-[ext_resource type="PackedScene" uid="uid://cbny488yapva0" path="res://SkinViewer.tscn" id="5_fxmuw"]
+[ext_resource type="Script" path="res://UI/TimerProgressBar.cs" id="3_bgjbm"]
+[ext_resource type="PackedScene" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_brtpr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_siock"]
 
@@ -49,6 +49,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_siock")
 tabs_visible = false
 
 [node name="TextPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
+visible = false
 layout_mode = 2
 alignment = 1
 
@@ -65,7 +66,7 @@ size_flags_vertical = 4
 
 [node name="Spinner" parent="ColorRect/TabContainer/TextPage/Control" instance=ExtResource("1_nc4mq")]
 position = Vector2(24, 24)
-rotation = 136085.0
+rotation = 136254.0
 Speed = 4.0
 
 [node name="AuthenticationPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
@@ -132,7 +133,6 @@ wait_time = 5.0
 one_shot = true
 
 [node name="LoggedInPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
-visible = false
 layout_mode = 2
 alignment = 1
 
@@ -148,8 +148,8 @@ theme_override_font_sizes/font_size = 24
 text = "Notch_"
 horizontal_alignment = 1
 
-[node name="SkinViewer" parent="ColorRect/TabContainer/LoggedInPage" instance=ExtResource("5_fxmuw")]
-custom_minimum_size = Vector2(300, 200)
+[node name="SkinViewer" parent="ColorRect/TabContainer/LoggedInPage" instance=ExtResource("5_brtpr")]
+custom_minimum_size = Vector2(150, 200)
 layout_mode = 2
 
 [connection signal="pressed" from="ColorRect/TabContainer/AuthenticationPage/VBoxContainer/Button" to="." method="OpenAuthPage"]
