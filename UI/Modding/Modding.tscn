@@ -1,0 +1,95 @@
+[gd_scene load_steps=4 format=3 uid="uid://cgux2cj3oq0ut"]
+
+[ext_resource type="Script" path="res://UI/Modding/Modding.cs" id="1_laql1"]
+[ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="2_5jidv"]
+[ext_resource type="Texture2D" uid="uid://nljn8r65v65t" path="res://UI/circle.svg" id="2_43f2x"]
+
+[node name="Modding" type="ColorRect" node_paths=PackedStringArray("NoLoaderWarning", "Spinner", "InstallFabricButton", "InstallerText", "SearchList")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.207843, 0.207843, 0.207843, 1)
+script = ExtResource("1_laql1")
+NoLoaderWarning = NodePath("NoLoaderWarning")
+Spinner = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer")
+InstallFabricButton = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/InstallFabric")
+InstallerText = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/Label")
+SearchList = NodePath("HBoxContainer/VBoxContainer/ItemList")
+PlaceholderModIcon = ExtResource("2_43f2x")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LineEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Search"
+
+[node name="ItemList" type="ItemList" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+fixed_icon_size = Vector2i(64, 64)
+
+[node name="NoLoaderWarning" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.498039)
+
+[node name="CenterContainer" type="CenterContainer" parent="NoLoaderWarning"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NoLoaderWarning/CenterContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "No mod loader installed"
+
+[node name="InstallFabric" type="Button" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Install Fabric"
+
+[node name="CenterContainer" type="CenterContainer" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Control" type="Control" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="Spinner" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer/Control" instance=ExtResource("2_5jidv")]
+position = Vector2(32, 32)
+rotation = 20086.8
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -37.0
+offset_bottom = 32.0
+grow_horizontal = 0
+text = "X"
+
+[connection signal="text_submitted" from="HBoxContainer/VBoxContainer/LineEdit" to="." method="SubmitSearch"]
+[connection signal="pressed" from="NoLoaderWarning/CenterContainer/VBoxContainer/InstallFabric" to="." method="InstallFabric"]
+[connection signal="pressed" from="Button" to="." method="queue_free"]

@@ -46,7 +46,13 @@ public class Instance
 		=> Paths.Instances + "/" + Id;
 
 	public string GetMinecraftDirectory()
-		=> Paths.Instances + "/" + Id + "/.minecraft";
+		=> GetDirectory() + "/.minecraft";
+
+	public string GetFabricDirectory()
+		=> GetMinecraftDirectory() + "/fabric";
+
+	public string GetModsDirectory()
+		=> GetMinecraftDirectory() + "/mods";
 
 	public string Name { get; set; }
 	public string Id { get; set; }
@@ -58,7 +64,8 @@ public class Instance
 
 public class InstanceFabricInfo
 {
-	public Version Version { get; set; }
+	public string Version { get; set; }
 	/// List of maven libraries in the following format: com.example:package:1.0.0
-	public List<string> Libraries { get; set; }
+	public List<string> Libraries { get; set; } = new();
+	public FabricMetaLauncherMeta LauncherMeta { get; set; }
 }

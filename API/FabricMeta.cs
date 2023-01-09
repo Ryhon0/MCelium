@@ -6,7 +6,8 @@ using System;
 
 public static class FabricMeta
 {
-	static string RootUrl = "https://meta.fabricmc.net";
+	public const string RootUrl = "https://meta.fabricmc.net";
+	public const string MavenUrl = "https://maven.fabricmc.net/";
 
 	public static async Task<List<FabricMetaGameVersion>> GetGameVersions()
 	{
