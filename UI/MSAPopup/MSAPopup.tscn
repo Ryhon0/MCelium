@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://damyjf5ocy73i"]
+[gd_scene load_steps=9 format=3 uid="uid://bdaseura3q1a3"]
 
-[ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="1_nc4mq"]
+[ext_resource type="PackedScene" path="res://UI/Spinner/Spinner.tscn" id="1_nc4mq"]
 [ext_resource type="Script" path="res://UI/MSAPopup/MSAPopup.cs" id="1_yllhe"]
-[ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://UI/circle_empty.svg" id="2_7d2w4"]
-[ext_resource type="Script" path="res://UI/TimerProgressBar.cs" id="3_bgjbm"]
-[ext_resource type="PackedScene" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_brtpr"]
+[ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://Assets/UI/circle_empty.svg" id="2_7d2w4"]
+[ext_resource type="Script" path="res://Assets/UI/TimerProgressBar.cs" id="3_bgjbm"]
+[ext_resource type="PackedScene" uid="uid://n1fikm7pgfeo" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_brtpr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_siock"]
 
@@ -49,7 +49,6 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_siock")
 tabs_visible = false
 
 [node name="TextPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
-visible = false
 layout_mode = 2
 alignment = 1
 
@@ -66,7 +65,7 @@ size_flags_vertical = 4
 
 [node name="Spinner" parent="ColorRect/TabContainer/TextPage/Control" instance=ExtResource("1_nc4mq")]
 position = Vector2(24, 24)
-rotation = 136254.0
+rotation = 136297.0
 Speed = 4.0
 
 [node name="AuthenticationPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
@@ -98,7 +97,7 @@ alignment = 1
 layout_mode = 2
 text = "Checking in {0} seconds... "
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("Timer")]
+[node name="TextureProgressBar" type="TextureProgressBar" parent="ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 max_value = 2.0
 step = 0.1
@@ -106,7 +105,6 @@ rounded = true
 fill_mode = 4
 texture_progress = ExtResource("2_7d2w4")
 script = ExtResource("3_bgjbm")
-Timer = NodePath("RetryTimer")
 Precission = 50
 
 [node name="RetryTimer" type="Timer" parent="ColorRect/TabContainer/AuthenticationPage/VBoxContainer/HBoxContainer/TextureProgressBar"]
@@ -117,7 +115,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Open in browser"
 
-[node name="TimeLeft" type="ProgressBar" parent="ColorRect/TabContainer/AuthenticationPage" node_paths=PackedStringArray("Timer")]
+[node name="TimeLeft" type="ProgressBar" parent="ColorRect/TabContainer/AuthenticationPage"]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxEmpty_ow3cn")
@@ -125,7 +123,6 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_l5iyr")
 value = 50.0
 show_percentage = false
 script = ExtResource("3_bgjbm")
-Timer = NodePath("AuthenticateTimer")
 Precission = 20
 
 [node name="AuthenticateTimer" type="Timer" parent="ColorRect/TabContainer/AuthenticationPage/TimeLeft"]
@@ -133,6 +130,7 @@ wait_time = 5.0
 one_shot = true
 
 [node name="LoggedInPage" type="VBoxContainer" parent="ColorRect/TabContainer"]
+visible = false
 layout_mode = 2
 alignment = 1
 

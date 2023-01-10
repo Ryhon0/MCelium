@@ -35,7 +35,7 @@ public partial class Modding : ColorRect
 		var ls = await FabricMeta.GetLoaders(Instance.Id);
 		var l = ls.FirstOrDefault(l => l.Loader.Stable);
 
-		if(l == null)
+		if (l == null)
 		{
 			InstallerText.Text = "Fabric is not available for this version";
 			Spinner.Visible = false;
@@ -138,7 +138,76 @@ public partial class Modding : ColorRect
 
 			DownloadIcon();
 		}
-	
+
 		searching = false;
 	}
+
+	/*
+	async Task DownloadMod(string query, string version, string loader)
+			{
+				var s = await Modrinth.Search(query, new (string, string)[] { ("versions", version), ("categories", loader) });
+
+				var mod = s.Hits.First();
+				// GD.Print($"{mod.Title} - https://modrinth.com/{mod.ProjectType}/{mod.Slug}");
+
+				var vers = await Modrinth.GetVersions(mod.ProjectID);
+				var v = vers.First(v => v.GameVersions.Contains(version) && v.Loaders.Contains(loader));
+
+				var f = v.Files.First(f => f.Primary);
+				GD.Print("Download " + f.Url);
+
+				var modout = mcdir + "mods/" + f.Filename;
+				if (!File.Exists(modout))
+				{
+					var ms = await new RequestBuilder(f.Url).Get<Stream>();
+					var mf = File.OpenWrite(modout);
+					await ms.CopyToAsync(mf);
+					mf.Close();
+				}
+
+				foreach (var d in v.Dependencies.Where(d => d.DependencyType == "required"))
+				{
+					if (d.VersionId != null)
+					{
+						var dver = await Modrinth.GetVersion(d.VersionId);
+
+						var df = dver.Files.First(f => f.Primary);
+						GD.Print("Download " + df.Url);
+
+						var depout = mcdir + "mods/" + df.Filename;
+
+						if (!File.Exists(depout))
+						{
+							var ds = await new RequestBuilder(f.Url).Get<Stream>();
+							var dmf = File.OpenWrite(depout);
+							await ds.CopyToAsync(dmf);
+							dmf.Close();
+						}
+					}
+					else
+					{
+						var dvers = await Modrinth.GetVersions(d.ProjectId);
+						var dver = dvers.First(dv => dv.GameVersions.Contains(version) && dv.Loaders.Contains(loader));
+
+						var df = dver.Files.First(f => f.Primary);
+
+						var depout = mcdir + "mods/" + df.Filename;
+
+						if (!File.Exists(depout))
+						{
+							var ds = await new RequestBuilder(f.Url).Get<Stream>();
+							var dmf = File.OpenWrite(depout);
+							await ds.CopyToAsync(dmf);
+							dmf.Close();
+						}
+					}
+				}
+			}
+
+			await DownloadMod("Sodium", "1.19.2", "fabric");
+			await DownloadMod("Lithium", "1.19.2", "fabric");
+			await DownloadMod("Iris Shaders", "1.19.2", "fabric");
+			await DownloadMod("Mod Menu", "1.19.2", "fabric");
+			await DownloadMod("Distant Horizons", "1.19.2", "fabric");
+	*/
 }

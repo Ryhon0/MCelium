@@ -3,8 +3,8 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://baw5bff0fvwmy"
-path.s3tc="res://.godot/imported/Minecraft_skin_template.png-5730a591f8d273a3aa8a3cc51f2b82ce.s3tc.ctex"
-path.etc2="res://.godot/imported/Minecraft_skin_template.png-5730a591f8d273a3aa8a3cc51f2b82ce.etc2.ctex"
+path.s3tc="res://.godot/imported/Minecraft_skin_template.png-89e311093172638d25db335864ca00e5.s3tc.ctex"
+path.etc2="res://.godot/imported/Minecraft_skin_template.png-89e311093172638d25db335864ca00e5.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc", "etc2"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://Models/Minecraft_skin_template.png"
-dest_files=["res://.godot/imported/Minecraft_skin_template.png-5730a591f8d273a3aa8a3cc51f2b82ce.s3tc.ctex", "res://.godot/imported/Minecraft_skin_template.png-5730a591f8d273a3aa8a3cc51f2b82ce.etc2.ctex"]
+source_file="res://Assets/Models/Minecraft_skin_template.png"
+dest_files=["res://.godot/imported/Minecraft_skin_template.png-89e311093172638d25db335864ca00e5.s3tc.ctex", "res://.godot/imported/Minecraft_skin_template.png-89e311093172638d25db335864ca00e5.etc2.ctex"]
 
 [params]
 

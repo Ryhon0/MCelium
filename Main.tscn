@@ -1,14 +1,14 @@
-[gd_scene load_steps=10 format=3 uid="uid://cpgnhx5qvpla5"]
+[gd_scene load_steps=10 format=3 uid="uid://crms0tm8hvu6x"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_si5fj"]
-[ext_resource type="Texture2D" uid="uid://ruc4bld6bxiw" path="res://UI/plus.svg" id="2_a64cc"]
-[ext_resource type="PackedScene" uid="uid://damyjf5ocy73i" path="res://UI/MSAPopup/MSAPopup.tscn" id="2_c56ui"]
+[ext_resource type="PackedScene" uid="uid://bdaseura3q1a3" path="res://UI/MSAPopup/MSAPopup.tscn" id="2_c56ui"]
 [ext_resource type="Texture2D" uid="uid://n1o2m71jd1ke" path="res://icon.svg" id="3_f1rbh"]
 [ext_resource type="PackedScene" uid="uid://bn8d3uovssa5k" path="res://UI/NewInstance/NewInstance.tscn" id="3_sakc4"]
-[ext_resource type="PackedScene" uid="uid://cgux2cj3oq0ut" path="res://UI/Modding/Modding.tscn" id="4_8i12f"]
-[ext_resource type="PackedScene" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_kgj02"]
-[ext_resource type="Texture2D" uid="uid://boab2idneq10v" path="res://UI/play.png" id="7_n1njp"]
-[ext_resource type="Texture2D" uid="uid://c0y32umdlb6wk" path="res://UI/trash.png" id="8_ykr13"]
+[ext_resource type="PackedScene" uid="uid://b3m7k6svg85ks" path="res://UI/Modding/Modding.tscn" id="4_8i12f"]
+[ext_resource type="Texture2D" uid="uid://ruc4bld6bxiw" path="res://Assets/UI/plus.svg" id="5_d65k7"]
+[ext_resource type="PackedScene" uid="uid://n1fikm7pgfeo" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_kgj02"]
+[ext_resource type="Texture2D" uid="uid://boab2idneq10v" path="res://Assets/UI/play.png" id="7_eygvr"]
+[ext_resource type="Texture2D" uid="uid://c0y32umdlb6wk" path="res://Assets/UI/trash.png" id="8_a23ap"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("SkinViewer", "InstanceList", "InstanceProperties", "InstanceNameLabel")]
 layout_mode = 3
@@ -25,7 +25,7 @@ InstanceNameLabel = NodePath("TabContainer/Instances/HSplitContainer/InstancePro
 MSAPopupScene = ExtResource("2_c56ui")
 NewInstanceScene = ExtResource("3_sakc4")
 ModsScene = ExtResource("4_8i12f")
-NewInstanceIcon = ExtResource("2_a64cc")
+NewInstanceIcon = ExtResource("5_d65k7")
 DefaultInstanceIcon = ExtResource("3_f1rbh")
 
 [node name="TabContainer" type="TabContainer" parent="."]
@@ -64,7 +64,7 @@ item_0/icon = ExtResource("3_f1rbh")
 item_1/text = "1.20"
 item_1/icon = ExtResource("3_f1rbh")
 item_2/text = "New instance"
-item_2/icon = ExtResource("2_a64cc")
+item_2/icon = ExtResource("5_d65k7")
 
 [node name="InstanceProperties" type="VBoxContainer" parent="TabContainer/Instances/HSplitContainer"]
 custom_minimum_size = Vector2(250, 0)
@@ -79,7 +79,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_type_variation = &"GreenButton"
 text = "Play"
-icon = ExtResource("7_n1njp")
+icon = ExtResource("7_eygvr")
 expand_icon = true
 
 [node name="Button" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
@@ -90,7 +90,7 @@ text = "Mods"
 layout_mode = 2
 theme_type_variation = &"RedButton"
 text = "Uninstall"
-icon = ExtResource("8_ykr13")
+icon = ExtResource("8_a23ap")
 expand_icon = true
 
 [node name="Skins" type="HBoxContainer" parent="TabContainer"]
@@ -104,7 +104,6 @@ auto_height = true
 item_count = 1
 icon_mode = 0
 item_0/text = "Upload skin"
-item_0/icon = ExtResource("2_a64cc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
 layout_mode = 2

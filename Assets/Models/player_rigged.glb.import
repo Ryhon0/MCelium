@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bp4rfbh4cpm6n"
-path="res://.godot/imported/player.glb-edcd0148ff1ee78c210416860e3306f7.scn"
+uid="uid://62cjsn2ruii5"
+path="res://.godot/imported/player_rigged.glb-f2d946b8b35a9f755954c5573a35e801.scn"
 
 [deps]
 
-source_file="res://Models/player.glb"
-dest_files=["res://.godot/imported/player.glb-edcd0148ff1ee78c210416860e3306f7.scn"]
+source_file="res://Assets/Models/player_rigged.glb"
+dest_files=["res://.godot/imported/player_rigged.glb-f2d946b8b35a9f755954c5573a35e801.scn"]
 
 [params]
 
@@ -18,19 +18,20 @@ nodes/root_name="Scene Root"
 nodes/apply_root_scale=true
 nodes/root_scale=1.0
 meshes/ensure_tangents=true
-meshes/generate_lods=false
+meshes/generate_lods=true
 meshes/create_shadow_meshes=true
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
+animation/trimming=false
 import_script/path=""
 _subresources={
 "materials": {
 "Material": {
 "use_external/enabled": true,
-"use_external/path": "res://player.tres"
+"use_external/path": "res://Models/player.tres"
 }
 }
 }

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dnxjxemeoif6f"
-path="res://.godot/imported/cape.png-d60f60afdd0405966e5a74da4e0fb0d0.ctex"
+path="res://.godot/imported/cape.png-2a0b19f4be0c9b30e7f7480a19977d0d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Models/cape.png"
-dest_files=["res://.godot/imported/cape.png-d60f60afdd0405966e5a74da4e0fb0d0.ctex"]
+source_file="res://Assets/Models/cape.png"
+dest_files=["res://.godot/imported/cape.png-2a0b19f4be0c9b30e7f7480a19977d0d.ctex"]
 
 [params]
 

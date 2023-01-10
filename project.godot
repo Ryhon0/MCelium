@@ -24,7 +24,7 @@ project/assembly_name="MCelium"
 
 [gui]
 
-theme/custom="res://Theme.tres"
+theme/custom="res://Assets/UI/Theme.tres"
 
 [rendering]
 

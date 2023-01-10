@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bf7dldqtegvg3"]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Texture2D" uid="uid://b6aidhyo8lklm" path="res://UI/spinner.svg" id="1_mhnkd"]
+[ext_resource type="Texture2D" uid="uid://b6aidhyo8lklm" path="res://Assets/UI/spinner.svg" id="1_mhnkd"]
 [ext_resource type="Script" path="res://UI/Spinner/Spinner.cs" id="2_ad3mr"]
 
 [node name="Spinner" type="Sprite2D"]
