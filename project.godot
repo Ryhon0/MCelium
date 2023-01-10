@@ -22,6 +22,10 @@ config/icon="res://icon.svg"
 
 project/assembly_name="MCelium"
 
+[gui]
+
+theme/custom="res://Theme.tres"
+
 [rendering]
 
 renderer/rendering_method="mobile"
