@@ -42,6 +42,11 @@ public class Instance
 		await File.WriteAllTextAsync(instdir + "/" + InstanceFile, JsonSerializer.Serialize(this));
 	}
 
+	public void Uninstall()
+	{
+		Directory.Delete(GetDirectory(), true);
+	}
+
 	public string GetDirectory()
 		=> Paths.Instances + "/" + Id;
 

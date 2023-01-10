@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cpgnhx5qvpla5"]
+[gd_scene load_steps=10 format=3 uid="uid://cpgnhx5qvpla5"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_si5fj"]
 [ext_resource type="Texture2D" uid="uid://ruc4bld6bxiw" path="res://UI/plus.svg" id="2_a64cc"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://bn8d3uovssa5k" path="res://UI/NewInstance/NewInstance.tscn" id="3_sakc4"]
 [ext_resource type="PackedScene" uid="uid://cgux2cj3oq0ut" path="res://UI/Modding/Modding.tscn" id="4_8i12f"]
 [ext_resource type="PackedScene" path="res://UI/SkinViewer/SkinViewer.tscn" id="5_kgj02"]
+[ext_resource type="Texture2D" uid="uid://boab2idneq10v" path="res://UI/play.png" id="7_n1njp"]
+[ext_resource type="Texture2D" uid="uid://c0y32umdlb6wk" path="res://UI/trash.png" id="8_ykr13"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("SkinViewer", "InstanceList", "InstanceProperties", "InstanceNameLabel")]
 layout_mode = 3
@@ -27,6 +29,7 @@ NewInstanceIcon = ExtResource("2_a64cc")
 DefaultInstanceIcon = ExtResource("3_f1rbh")
 
 [node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -35,28 +38,20 @@ grow_vertical = 2
 tab_alignment = 1
 
 [node name="Instances" type="VBoxContainer" parent="TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="HSplitContainer" type="HSplitContainer" parent="TabContainer/Instances"]
-offset_right = 1152.0
-offset_bottom = 617.0
+layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Instances/HSplitContainer"]
 custom_minimum_size = Vector2(148, 0)
-offset_right = 890.0
-offset_bottom = 617.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="InstanceList" type="ItemList" parent="TabContainer/Instances/HSplitContainer/ScrollContainer"]
 custom_minimum_size = Vector2(128, 0)
-offset_right = 890.0
-offset_bottom = 617.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 item_count = 3
@@ -73,32 +68,37 @@ item_2/icon = ExtResource("2_a64cc")
 
 [node name="InstanceProperties" type="VBoxContainer" parent="TabContainer/Instances/HSplitContainer"]
 custom_minimum_size = Vector2(250, 0)
-offset_left = 902.0
-offset_right = 1152.0
-offset_bottom = 617.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-offset_right = 250.0
-offset_bottom = 26.0
+layout_mode = 2
 text = "Minecraft Java 1.19.2"
 horizontal_alignment = 1
 
 [node name="Play" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-offset_top = 30.0
-offset_right = 250.0
-offset_bottom = 61.0
+layout_mode = 2
+theme_type_variation = &"GreenButton"
 text = "Play"
+icon = ExtResource("7_n1njp")
+expand_icon = true
 
 [node name="Button" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-offset_top = 65.0
-offset_right = 250.0
-offset_bottom = 96.0
+layout_mode = 2
 text = "Mods"
+
+[node name="Uninstall" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
+layout_mode = 2
+theme_type_variation = &"RedButton"
+text = "Uninstall"
+icon = ExtResource("8_ykr13")
+expand_icon = true
 
 [node name="Skins" type="HBoxContainer" parent="TabContainer"]
 visible = false
+layout_mode = 2
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
+layout_mode = 2
 size_flags_horizontal = 3
 auto_height = true
 item_count = 1
@@ -107,12 +107,15 @@ item_0/text = "Upload skin"
 item_0/icon = ExtResource("2_a64cc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
 [node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("5_kgj02")]
+layout_mode = 2
 
 [connection signal="item_activated" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceActivated"]
 [connection signal="item_selected" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceSelected"]
 [connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Play" to="." method="PlaySelected"]
 [connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Button" to="." method="ShowModsScreen"]
+[connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Uninstall" to="." method="UninstallSelected"]

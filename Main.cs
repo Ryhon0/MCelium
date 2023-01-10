@@ -98,6 +98,16 @@ public partial class Main : Control
 		AddChild(m);
 	}
 
+	void UninstallSelected()
+	{
+		var id = InstanceList.GetSelectedItems()[0];
+		var i = Instances[id];
+		i.Uninstall();
+
+		InstanceList.RemoveItem(id);
+		Instances.Remove(i);
+	}
+
 	void OnInstanceActivated(int idx)
 	{
 		if (idx == InstanceList.ItemCount - 1)
