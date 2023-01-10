@@ -57,8 +57,8 @@ public class MinecraftSkin
 	public const string StateActive = "ACTIVE";
 
 
-	[JsonPropertyName("name")]
-	public string Username { get; set; }
+	[JsonPropertyName("id")]
+	public string Id { get; set; }
 	[JsonPropertyName("state")]
 	public string State { get; set; }
 	[JsonPropertyName("url")]
