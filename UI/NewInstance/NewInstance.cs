@@ -18,16 +18,21 @@ public partial class NewInstance : ColorRect
 	Control InstallPage, ProgressPage;
 	[Export]
 	Label InfoLabel, SubInfoLabel;
+	[Export]
+	Button DownloadButton;
+	[Export]
+	CheckBox Release, Snapshot, Alpha, Beta;
 
 	MinecraftManifest Manifest;
 
 	public override async void _Ready()
 	{
+		DownloadButton.Disabled = true;
 		Manifest = await MinecraftLauncher.GetManifest();
-		foreach (var v in Manifest.Versions)
-		{
-			VersionButton.AddItem(v.VersionType + " " + v.Id);
-		}
+
+		PopulateVersionList();
+
+		DownloadButton.Disabled = false;
 	}
 
 	async void Download()
@@ -37,7 +42,7 @@ public partial class NewInstance : ColorRect
 
 		InfoLabel.Text = "Getting metadata";
 
-		var v = Manifest.Versions[VersionButton.Selected];
+		var v = GetFilteredVersions().ToList()[VersionButton.Selected];
 		var meta = await MinecraftLauncher.GetVersionMeta(v.Url);
 		var instance = new Instance()
 		{
@@ -95,7 +100,7 @@ public partial class NewInstance : ColorRect
 			long dlSize = toDownload.Sum(d => d.Value.Size);
 			long dlProgress = 0;
 
-			InfoLabel.Text = $"Downloading assets (0B/{dlSize.BytesToString()}, 0%)" ;
+			InfoLabel.Text = $"Downloading assets (0B/{dlSize.BytesToString()}, 0%)";
 
 			// https://wiki.vg/Game_files
 			foreach (var d in toDownload)
@@ -115,8 +120,8 @@ public partial class NewInstance : ColorRect
 
 				dlProgress += res.Length;
 				var precentage = ((dlProgress / (float)dlSize) * 100).ToString("0.0");
-			
-				InfoLabel.Text = $"Downloading assets ({dlProgress.BytesToString()}/{dlSize.BytesToString()}, {precentage}%)" ;
+
+				InfoLabel.Text = $"Downloading assets ({dlProgress.BytesToString()}/{dlSize.BytesToString()}, {precentage}%)";
 			}
 		}
 
@@ -236,7 +241,7 @@ public partial class NewInstance : ColorRect
 		// Download Java
 		{
 			// Check if a matching major Java version is already installed 
-			if(!Java.Versions.Any(v=>v.MajorVersion == meta.JavaVersion.MajorVersion))
+			if (!Java.Versions.Any(v => v.MajorVersion == meta.JavaVersion.MajorVersion))
 			{
 				// Unlike the launcher, architecture bitness matters
 				var javaArch = "x64";
@@ -267,15 +272,15 @@ public partial class NewInstance : ColorRect
 					}
 				};
 
-				while(r.MoveToNextEntry())
+				while (r.MoveToNextEntry())
 				{
 					var e = r.Entry;
-					if(e.IsDirectory) continue;
-					
+					if (e.IsDirectory) continue;
+
 					var k = e.Key;
 
-					if(e.Key.StartsWith(javaname))
-						k = k[(javaname.Length+1)..];
+					if (e.Key.StartsWith(javaname))
+						k = k[(javaname.Length + 1)..];
 
 					var outdir = javadir + "/" + k;
 					Directory.CreateDirectory(Path.GetDirectoryName(outdir));
@@ -284,14 +289,14 @@ public partial class NewInstance : ColorRect
 					r.WriteEntryToFile(outdir, eo);
 
 					// This is awful but Mono Unix syscalls didn't work
-					if(e is TarEntry te)
+					if (e is TarEntry te)
 					{
 						string PermissionString(long perms)
 						{
 							string s = "";
-							for(int i=0;i<3;i++)
+							for (int i = 0; i < 3; i++)
 							{
-								var p = (perms >> (i*3)) & 0b111;
+								var p = (perms >> (i * 3)) & 0b111;
 								s = p.ToString() + s;
 							}
 							return s;
@@ -300,7 +305,7 @@ public partial class NewInstance : ColorRect
 						var p = new System.Diagnostics.Process();
 						p.StartInfo = new System.Diagnostics.ProcessStartInfo()
 						{
-							FileName ="chmod",
+							FileName = "chmod",
 							UseShellExecute = false,
 							Arguments = PermissionString(te.Mode) + " " + outdir
 						};
@@ -317,5 +322,52 @@ public partial class NewInstance : ColorRect
 		await instance.Save();
 
 		GetTree().ReloadCurrentScene();
+	}
+
+	void OnReleaseTypeChanged(bool b)
+	{
+		PopulateVersionList();
+	}
+
+	void PopulateVersionList()
+	{
+		VersionButton.Clear();
+		foreach (var v in GetFilteredVersions())
+		{
+			VersionButton.AddItem(v.VersionType + " " + v.Id);
+		}
+	}
+
+	IEnumerable<MinecraftVersion> GetFilteredVersions()
+	{
+		foreach (var v in Manifest.Versions)
+		{
+			switch (v.VersionType)
+			{
+				case MinecraftVersion.VersionTypeRelease:
+					if (Release.ButtonPressed)
+						yield return v;
+					break;
+
+				case MinecraftVersion.VersionTypeSnapshot:
+					if (Snapshot.ButtonPressed)
+						yield return v;
+					break;
+
+				case MinecraftVersion.VersionTypeAlpha:
+					if (Alpha.ButtonPressed)
+						yield return v;
+					break;
+
+				case MinecraftVersion.VersionTypeBeta:
+					if (Beta.ButtonPressed)
+						yield return v;
+					break;
+
+				default:
+					yield return v;
+					break;
+			}
+		}
 	}
 }

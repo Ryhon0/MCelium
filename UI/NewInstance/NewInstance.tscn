@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://UI/NewInstance/NewInstance.cs" id="1_xvi3p"]
 [ext_resource type="PackedScene" uid="uid://bf7dldqtegvg3" path="res://UI/Spinner/Spinner.tscn" id="2_ykja3"]
 
-[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "InfoLabel", "SubInfoLabel")]
+[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "InfoLabel", "SubInfoLabel", "DownloadButton", "Release", "Snapshot", "Alpha", "Beta")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,6 +16,11 @@ InstallPage = NodePath("CenterContainer/VBoxContainer")
 ProgressPage = NodePath("CenterContainer/ProgressPage")
 InfoLabel = NodePath("CenterContainer/ProgressPage/Info")
 SubInfoLabel = NodePath("CenterContainer/ProgressPage/Subinfo")
+DownloadButton = NodePath("CenterContainer/VBoxContainer/Button")
+Release = NodePath("CenterContainer/VBoxContainer/Release")
+Snapshot = NodePath("CenterContainer/VBoxContainer/Snapshot")
+Alpha = NodePath("CenterContainer/VBoxContainer/Alpha")
+Beta = NodePath("CenterContainer/VBoxContainer/Beta")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -32,6 +37,23 @@ layout_mode = 2
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 text = "Version"
+
+[node name="Release" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Release"
+
+[node name="Snapshot" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Snapshot"
+
+[node name="Beta" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Beta"
+
+[node name="Alpha" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Alpha"
 
 [node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -63,6 +85,22 @@ layout_mode = 2
 
 [node name="Spinner" parent="CenterContainer/ProgressPage/CenterContainer/Control" instance=ExtResource("2_ykja3")]
 position = Vector2(32, 32)
-rotation = 27384.6
+rotation = 36278.2
 
+[node name="Button" type="Button" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_bottom = 32.0
+grow_horizontal = 0
+text = "X"
+
+[connection signal="toggled" from="CenterContainer/VBoxContainer/Release" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/VBoxContainer/Snapshot" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/VBoxContainer/Beta" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/VBoxContainer/Alpha" to="." method="OnReleaseTypeChanged"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="." method="Download"]
+[connection signal="pressed" from="Button" to="." method="queue_free"]
