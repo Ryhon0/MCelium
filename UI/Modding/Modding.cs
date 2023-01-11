@@ -105,9 +105,11 @@ public partial class Modding : ColorRect
 
 			async void DownloadIcon()
 			{
+				if(string.IsNullOrEmpty(m.IconUrl)) return;
+
 				var ext = m.IconUrl.Split('.').Last().ToLower();
 
-				var imgstream = await new RequestBuilder(m.IconUrl).Get<Stream>();
+				var imgstream = await WebCache.Get(m.IconUrl);
 				var imgms = new MemoryStream();
 				await imgstream.CopyToAsync(imgms);
 
