@@ -29,7 +29,6 @@ NewInstanceIcon = ExtResource("5_d65k7")
 DefaultInstanceIcon = ExtResource("3_f1rbh")
 
 [node name="TabContainer" type="TabContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -38,20 +37,26 @@ grow_vertical = 2
 tab_alignment = 1
 
 [node name="Instances" type="VBoxContainer" parent="TabContainer"]
-layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
 
 [node name="HSplitContainer" type="HSplitContainer" parent="TabContainer/Instances"]
-layout_mode = 2
+offset_right = 1152.0
+offset_bottom = 617.0
 size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Instances/HSplitContainer"]
 custom_minimum_size = Vector2(148, 0)
-layout_mode = 2
+offset_right = 890.0
+offset_bottom = 617.0
 size_flags_horizontal = 3
 
 [node name="InstanceList" type="ItemList" parent="TabContainer/Instances/HSplitContainer/ScrollContainer"]
 custom_minimum_size = Vector2(128, 0)
-layout_mode = 2
+offset_right = 890.0
+offset_bottom = 617.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 item_count = 3
@@ -68,26 +73,35 @@ item_2/icon = ExtResource("5_d65k7")
 
 [node name="InstanceProperties" type="VBoxContainer" parent="TabContainer/Instances/HSplitContainer"]
 custom_minimum_size = Vector2(250, 0)
-layout_mode = 2
+offset_left = 902.0
+offset_right = 1152.0
+offset_bottom = 617.0
 
 [node name="Label" type="Label" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-layout_mode = 2
+offset_right = 250.0
+offset_bottom = 26.0
 text = "Minecraft Java 1.19.2"
 horizontal_alignment = 1
 
 [node name="Play" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-layout_mode = 2
+offset_top = 30.0
+offset_right = 250.0
+offset_bottom = 61.0
 theme_type_variation = &"GreenButton"
 text = "Play"
 icon = ExtResource("7_eygvr")
 expand_icon = true
 
 [node name="Button" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-layout_mode = 2
+offset_top = 65.0
+offset_right = 250.0
+offset_bottom = 96.0
 text = "Mods"
 
 [node name="Uninstall" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
-layout_mode = 2
+offset_top = 100.0
+offset_right = 250.0
+offset_bottom = 131.0
 theme_type_variation = &"RedButton"
 text = "Uninstall"
 icon = ExtResource("8_a23ap")
@@ -95,23 +109,29 @@ expand_icon = true
 
 [node name="Skins" type="HBoxContainer" parent="TabContainer"]
 visible = false
-layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
-layout_mode = 2
+offset_right = 765.0
+offset_bottom = 617.0
 size_flags_horizontal = 3
 auto_height = true
 item_count = 1
 icon_mode = 0
 item_0/text = "Upload skin"
+item_0/icon = ExtResource("5_d65k7")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Skins"]
-layout_mode = 2
+offset_left = 769.0
+offset_right = 1152.0
+offset_bottom = 617.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.5
 
 [node name="SkinViewer" parent="TabContainer/Skins/VBoxContainer" instance=ExtResource("5_kgj02")]
-layout_mode = 2
 
 [connection signal="item_activated" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceActivated"]
 [connection signal="item_selected" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceSelected"]
