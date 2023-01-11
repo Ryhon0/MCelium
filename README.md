@@ -17,16 +17,14 @@ Cross-platform gamepad friendly launcher for Minecraft Java and Bedrock Edition.
 - [ ] Uploading skins
 - [ ] Switching skins
 #### Modding
-- [x] Installing Fabric loader*  
+- [x] Installing Fabric loader  
 - [ ] Installing Forge
-- [x] Installing mods from Modrinth*  
+- [x] Installing mods from Modrinth  
 	- [x] Downloading dependencies
 	- [ ] Managing multiple dependency versions  
 	- [ ] Updating mods
 - [ ] Installing modpacks from Modrinth  
 - [ ] Installing resourcepacks from Modrinth  
-
-*No GUI available yet 
 
 ## Bedrock Edition
 - [ ] Downloading Bedrock Edition
