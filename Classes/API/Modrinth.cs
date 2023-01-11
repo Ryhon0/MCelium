@@ -38,6 +38,12 @@ public static class Modrinth
 		return await new RequestBuilder(RootUrl + $"/version/{id}")
 			.Get<ModrinthModVersion>();
 	}
+
+	public static async Task<ModrinthProject> GetProject(string id)
+	{
+		return await new RequestBuilder(RootUrl + $"/project/{id}")
+			.Get<ModrinthProject>();
+	}
 }
 
 public class ModrinthSearchResponse
@@ -45,7 +51,7 @@ public class ModrinthSearchResponse
 	[JsonPropertyName("hits")]
 	/// Array of objects
 	/// The list of results
-	public List<ModrinthSearchHit> Hits { get; set; }
+	public List<ModrinthProject> Hits { get; set; }
 
 	[JsonPropertyName("offset")]
 	/// The number of results that were skipped by the query
@@ -60,7 +66,7 @@ public class ModrinthSearchResponse
 	public int TotalHits { get; set; }
 }
 
-public class ModrinthSearchHit
+public class ModrinthProject
 {
 	[JsonPropertyName("slug")]
 	/// The slug of a project, used for vanity URLs. Regex: ^[\w!@$()`.+,"\-']{3,64}$
@@ -133,13 +139,14 @@ public class ModrinthSearchHit
 	/// The latest version of minecraft that this project supports
 	public string LatestVersion { get; set; }
 
-	[JsonPropertyName("license")]
-	/// The license of the project
-	public string License { get; set; }
-
+	/*
+		[JsonPropertyName("license")]
+		/// The license of the project
+		public string License { get; set; }
 	[JsonPropertyName("gallery")]
 	/// All gallery images attached to the project
 	public List<string> Gallery { get; set; }
+	*/
 }
 
 public class ModrinthModVersion

@@ -73,4 +73,23 @@ public class InstanceFabricInfo
 	/// List of maven libraries in the following format: com.example:package:1.0.0
 	public List<string> Libraries { get; set; } = new();
 	public FabricMetaLauncherMeta LauncherMeta { get; set; }
+	public List<Mod> Mods { get; set; } = new();
+}
+
+public class Mod
+{
+	public string Name { get; set; }
+	public string ProjectID { get; set; }
+	public string Version { get; set; }
+	public string File { get; set; }
+	public string Icon { get; set; }
+	public bool InstalledExplicitly { get; set; }
+	public List<string> DependsOn { get; set; } = new();
+	public List<ModDependency> Dependencies { get; set; }
+}
+
+public class ModDependency
+{
+	public string ProjectID { get; set; }
+	public string Version { get; set; }
 }

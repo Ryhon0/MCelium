@@ -1,10 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://b3m7k6svg85ks"]
+[gd_scene load_steps=6 format=3 uid="uid://b3m7k6svg85ks"]
 
 [ext_resource type="Script" path="res://UI/Modding/Modding.cs" id="1_laql1"]
 [ext_resource type="PackedScene" path="res://UI/Spinner/Spinner.tscn" id="2_5jidv"]
 [ext_resource type="Texture2D" uid="uid://nljn8r65v65t" path="res://Assets/UI/circle.svg" id="2_43f2x"]
+[ext_resource type="Texture2D" uid="uid://dfsco5bpjl7ly" path="res://icon.png" id="3_68mj2"]
+[ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://Assets/UI/circle_empty.svg" id="4_u850a"]
 
-[node name="Modding" type="ColorRect" node_paths=PackedStringArray("NoLoaderWarning", "Spinner", "InstallFabricButton", "InstallerText", "SearchList")]
+[node name="Modding" type="ColorRect" node_paths=PackedStringArray("NoLoaderWarning", "Spinner", "InstallFabricButton", "InstallerText", "SearchList", "InstalledList", "InstalledPage")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,34 +18,72 @@ NoLoaderWarning = NodePath("NoLoaderWarning")
 Spinner = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer")
 InstallFabricButton = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/InstallFabric")
 InstallerText = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/Label")
-SearchList = NodePath("HBoxContainer/VBoxContainer/ItemList")
+SearchList = NodePath("TabContainer/Download/VBoxContainer/ItemList")
+InstalledList = NodePath("TabContainer/Installed/VBoxContainer/ItemList")
+InstalledPage = NodePath("TabContainer/Installed")
 PlaceholderModIcon = ExtResource("2_43f2x")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+tab_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
-offset_right = 1152.0
-offset_bottom = 648.0
+[node name="Download" type="HBoxContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Download"]
+layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LineEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer"]
-offset_right = 1152.0
-offset_bottom = 31.0
+[node name="LineEdit" type="LineEdit" parent="TabContainer/Download/VBoxContainer"]
+layout_mode = 2
 placeholder_text = "Search"
 
-[node name="ItemList" type="ItemList" parent="HBoxContainer/VBoxContainer"]
-offset_top = 35.0
-offset_right = 1152.0
-offset_bottom = 648.0
+[node name="ItemList" type="ItemList" parent="TabContainer/Download/VBoxContainer"]
+layout_mode = 2
 size_flags_vertical = 3
+select_mode = 1
 fixed_icon_size = Vector2i(64, 64)
 
+[node name="InstallButton" type="Button" parent="TabContainer/Download/VBoxContainer"]
+layout_mode = 2
+text = "Download selected"
+
+[node name="Installed" type="HBoxContainer" parent="TabContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Installed"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemList" type="ItemList" parent="TabContainer/Installed/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+select_mode = 1
+item_count = 4
+fixed_icon_size = Vector2i(64, 64)
+item_0/text = "1"
+item_0/icon = ExtResource("3_68mj2")
+item_1/text = "32"
+item_1/icon = ExtResource("3_68mj2")
+item_2/text = "3"
+item_2/icon = ExtResource("2_43f2x")
+item_3/text = "4"
+item_3/icon = ExtResource("4_u850a")
+
+[node name="Button" type="Button" parent="TabContainer/Installed/VBoxContainer"]
+layout_mode = 2
+text = "Uninstall selected"
+
 [node name="NoLoaderWarning" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -52,6 +92,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.498039)
 
 [node name="CenterContainer" type="CenterContainer" parent="NoLoaderWarning"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -59,39 +100,32 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NoLoaderWarning/CenterContainer"]
-offset_left = 483.0
-offset_top = 293.0
-offset_right = 669.0
-offset_bottom = 354.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
-offset_right = 186.0
-offset_bottom = 26.0
+layout_mode = 2
 text = "No mod loader installed"
 horizontal_alignment = 1
 
 [node name="InstallFabric" type="Button" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
-offset_top = 30.0
-offset_right = 186.0
-offset_bottom = 61.0
+layout_mode = 2
 text = "Install Fabric"
 
 [node name="CenterContainer" type="CenterContainer" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
 visible = false
+layout_mode = 2
 
 [node name="Control" type="Control" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer"]
 custom_minimum_size = Vector2(64, 64)
-layout_mode = 3
-anchors_preset = 0
-offset_right = 64.0
-offset_bottom = 64.0
+layout_mode = 2
 
 [node name="Spinner" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer/Control" instance=ExtResource("2_5jidv")]
 position = Vector2(32, 32)
-rotation = 21138.4
+rotation = 111704.0
 
 [node name="Button" type="Button" parent="."]
 custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -100,6 +134,8 @@ offset_bottom = 32.0
 grow_horizontal = 0
 text = "X"
 
-[connection signal="text_submitted" from="HBoxContainer/VBoxContainer/LineEdit" to="." method="SubmitSearch"]
+[connection signal="text_submitted" from="TabContainer/Download/VBoxContainer/LineEdit" to="." method="SubmitSearch"]
+[connection signal="pressed" from="TabContainer/Download/VBoxContainer/InstallButton" to="." method="DownloadSelected"]
+[connection signal="pressed" from="TabContainer/Installed/VBoxContainer/Button" to="." method="UninstallSelected"]
 [connection signal="pressed" from="NoLoaderWarning/CenterContainer/VBoxContainer/InstallFabric" to="." method="InstallFabric"]
 [connection signal="pressed" from="Button" to="." method="queue_free"]
