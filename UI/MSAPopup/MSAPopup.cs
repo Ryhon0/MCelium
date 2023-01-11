@@ -91,8 +91,6 @@ public partial class MSAPopup : VBoxContainer
 		Tabs.CurrentTab = TextPage.GetIndex();
 
 		var profile = await Minecraft.GetProfile(mclogin.AccessToken);
-
-		GD.Print(profile.Username);
 		#endregion
 
 		#region Player skin

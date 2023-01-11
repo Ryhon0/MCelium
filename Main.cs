@@ -112,15 +112,12 @@ public partial class Main : Control
 	{
 		if (idx == InstanceList.ItemCount - 1)
 		{
-			GD.Print("Creating new instance...");
 			var i = NewInstanceScene.Instantiate<NewInstance>();
 			AddChild(i);
 		}
 		else
 		{
 			var i = Instances[idx];
-			GD.Print("Launching " + i.Name + "...");
-
 			var p = Profiles.First();
 
 			LaunchInstance(i, p);
@@ -131,7 +128,7 @@ public partial class Main : Control
 	{
 		var mainClass = i.Meta.MainClass;
 
-		if(i.Fabric != null)
+		if (i.Fabric != null)
 		{
 			if (i.Fabric.LauncherMeta.MainClass is JsonObject o)
 				mainClass = (string)(o["client"]);
@@ -231,12 +228,21 @@ public partial class Main : Control
 		var proc = new Process();
 		proc.StartInfo = psi;
 
-		GD.Print("Starting...");
-
 		proc.Start();
 		await proc.WaitForExitAsync();
 
-		GD.Print(proc.ExitCode);
-		GD.Print(proc.StandardError.ReadToEnd());
+		{
+			var exitstr = $"{i.Name} exited with error code {proc.ExitCode}";
+			if (proc.ExitCode == 0)
+			{
+				GD.Print(exitstr);
+				GD.Print(proc.StandardError.ReadToEnd());
+			}
+			else
+			{
+				GD.PrintErr(exitstr);
+				GD.PrintErr(proc.StandardError.ReadToEnd());
+			}
+		}
 	}
 }

@@ -51,7 +51,6 @@ public partial class NewInstance : ColorRect
 			Name = v.Id,
 			Meta = meta,
 		};
-		GD.Print(v.Id);
 
 		var objectsdir = Paths.AssetsObjects;
 		var indexesdir = Paths.AssetsIndexes;
@@ -218,7 +217,6 @@ public partial class NewInstance : ColorRect
 									}
 								if (exclude) continue;
 
-								GD.Print("Extracting " + e.Key);
 								var outdir = mcdir + "/natives/" + e.Key;
 
 								var fi = new System.IO.FileInfo(outdir);
@@ -284,7 +282,6 @@ public partial class NewInstance : ColorRect
 
 					var outdir = javadir + "/" + k;
 					Directory.CreateDirectory(Path.GetDirectoryName(outdir));
-					GD.Print(outdir);
 
 					r.WriteEntryToFile(outdir, eo);
 
@@ -309,7 +306,6 @@ public partial class NewInstance : ColorRect
 							UseShellExecute = false,
 							Arguments = PermissionString(te.Mode) + " " + outdir
 						};
-						GD.Print(p.StartInfo.Arguments);
 						p.Start();
 						await p.WaitForExitAsync();
 					}

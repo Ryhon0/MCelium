@@ -21,8 +21,6 @@ public partial class SkinViewer : SubViewportContainer
 	{
 		if (skin == null) return;
 
-		GD.Print(skin.Variant);
-
 		if (skin.Variant == MinecraftSkin.VariantSlim)
 		{
 			Model.GetNode<Node3D>("ClassicOverlay").Visible = false;

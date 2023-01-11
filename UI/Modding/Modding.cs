@@ -59,7 +59,6 @@ public partial class Modding : ColorRect
 
 			if (File.Exists(outfile)) return;
 
-			GD.Print(l.Name);
 			var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
 			var f = File.OpenWrite(outfile);
 			await s.CopyToAsync(f);
@@ -148,13 +147,11 @@ public partial class Modding : ColorRect
 				var s = await Modrinth.Search(query, new (string, string)[] { ("versions", version), ("categories", loader) });
 
 				var mod = s.Hits.First();
-				// GD.Print($"{mod.Title} - https://modrinth.com/{mod.ProjectType}/{mod.Slug}");
 
 				var vers = await Modrinth.GetVersions(mod.ProjectID);
 				var v = vers.First(v => v.GameVersions.Contains(version) && v.Loaders.Contains(loader));
 
 				var f = v.Files.First(f => f.Primary);
-				GD.Print("Download " + f.Url);
 
 				var modout = mcdir + "mods/" + f.Filename;
 				if (!File.Exists(modout))
@@ -172,7 +169,6 @@ public partial class Modding : ColorRect
 						var dver = await Modrinth.GetVersion(d.VersionId);
 
 						var df = dver.Files.First(f => f.Primary);
-						GD.Print("Download " + df.Url);
 
 						var depout = mcdir + "mods/" + df.Filename;
 
