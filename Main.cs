@@ -242,6 +242,7 @@ public partial class Main : Control
 			{
 				GD.PrintErr(exitstr);
 				GD.PrintErr(proc.StandardError.ReadToEnd());
+				GD.PrintErr(proc.StandardOutput.ReadToEnd());
 			}
 		}
 	}

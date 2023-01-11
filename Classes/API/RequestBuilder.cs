@@ -93,6 +93,9 @@ public class RequestBuilder
 			Godot.DisplayServer.ClipboardSet(await r.Content.ReadAsStringAsync());
 		}
 
+		if((int)r.StatusCode < 200 || (int)r.StatusCode >= 300)
+			throw new Exception($"HTTP status {(int)r.StatusCode}\n{await r.Content.ReadAsStringAsync()}");
+
 		if (typeof(T) == typeof(string))
 		{
 			return (T)(object)(await r.Content.ReadAsStringAsync());

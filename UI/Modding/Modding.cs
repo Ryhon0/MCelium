@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.Json;
 
 public partial class Modding : ColorRect
 {
@@ -40,10 +41,10 @@ public partial class Modding : ColorRect
 
 		InstalledPage.Name = $"Installed ({Instance.Fabric.Mods.Count})";
 		InstalledList.Clear();
-		foreach (var m in Instance.Fabric.Mods.OrderBy(m=>!m.InstalledExplicitly))
+		foreach (var m in Instance.Fabric.Mods)
 		{
 			var title = m.Name;
-			if(m.DependsOn.Any()) title += $" (Required by: {string.Join(',', m.DependsOn.Select(d=>Instance.Fabric.Mods.First(m=>m.ProjectID == d).Name))})";
+			if (m.DependsOn.Any()) title += $" (Required by: {string.Join(',', m.DependsOn.Select(d => Instance.Fabric.Mods.First(m => m.ProjectID == d).Name))})";
 
 			var i = InstalledList.AddItem(title);
 			InstalledList.SetItemIcon(i, PlaceholderModIcon);
@@ -56,6 +57,9 @@ public partial class Modding : ColorRect
 
 			LoadIcon();
 		}
+
+		if (Hits == null || Hits.Count == 0)
+			SubmitSearch("");
 	}
 
 	async void InstallFabric()
@@ -168,6 +172,60 @@ public partial class Modding : ColorRect
 
 		async Task InstallMod(string projectId, string requiredBy = null)
 		{
+			async Task InstallVersion(ModrinthProject p, ModrinthModVersion v, string requiredBy = null)
+			{
+				p = p ?? await Modrinth.GetProject(v.ProjectId);
+
+				foreach (var d in v.Dependencies)
+				{
+					switch (d.DependencyType)
+					{
+						case "required":
+							if (d.ProjectId != null) await InstallMod(d.ProjectId, projectId);
+							else await InstallVersion(null, await Modrinth.GetVersion(d.VersionId), projectId);
+							break;
+						case "incompatible":
+							var icm = Instance.Fabric.Mods.FirstOrDefault(m => m.ProjectID == d.ProjectId);
+							if (icm != null)
+							{
+								GD.Print($"{p.Title} is incopatible with {icm.Name}, not installing");
+								continue;
+							}
+							break;
+						case "embedded":
+							// TODO: handle this
+							GD.Print($"{p.Title} provides {d.ProjectId}");
+							break;
+					}
+				}
+
+				var f = v.Files.First();
+				GD.Print(f.Filename);
+
+				var mi = new Mod()
+				{
+					Name = p.Title,
+					ProjectID = projectId,
+					Version = v.Id,
+					File = f.Filename,
+					Icon = p.IconUrl,
+					InstalledExplicitly = requiredBy == null,
+					Dependencies = v.Dependencies.Select(d => new ModDependency()
+					{
+						ProjectID = d.ProjectId,
+						Version = d.VersionId
+					}).ToList()
+				};
+				if (requiredBy != null) mi.DependsOn = new List<string>() { requiredBy };
+
+				var js = await new RequestBuilder(f.Url).Get<Stream>();
+				var fs = File.OpenWrite(Instance.GetModsDirectory() + "/" + f.Filename);
+				await js.CopyToAsync(fs);
+				fs.Close();
+
+				Instance.Fabric.Mods.Add(mi);
+			}
+
 			if (Instance.Fabric.Mods.Any(im => im.ProjectID == projectId))
 			{
 				GD.Print(projectId + " already installed, skipping");
@@ -186,35 +244,7 @@ public partial class Modding : ColorRect
 				.First(v => v.GameVersions.Contains(Instance.Version.Id) &&
 						v.Loaders.Contains("fabric"));
 
-			var f = v.Files.First();
-			GD.Print(f.Filename);
-
-			var mi = new Mod()
-			{
-				Name = p.Title,
-				ProjectID = projectId,
-				Version = v.Id,
-				File = f.Filename,
-				Icon = p.IconUrl,
-				InstalledExplicitly = requiredBy == null,
-				Dependencies = v.Dependencies.Select(d => new ModDependency() 
-					{
-						ProjectID = d.ProjectId,
-						Version = d.VersionId
-					}).ToList()
-			};
-			if(requiredBy != null) mi.DependsOn = new List<string>() { requiredBy };
-
-			var js = await new RequestBuilder(f.Url).Get<Stream>();
-			var fs = File.OpenWrite(Instance.GetModsDirectory() + "/" + f.Filename);
-			await js.CopyToAsync(fs);
-			fs.Close();
-
-			Instance.Fabric.Mods.Add(mi);
-
-			GD.Print(v.Dependencies.Count);
-			foreach (var d in v.Dependencies)
-				await InstallMod(d.ProjectId, projectId);
+			await InstallVersion(p, v, requiredBy);
 		}
 
 		foreach (var m in mods)
@@ -230,16 +260,20 @@ public partial class Modding : ColorRect
 
 	async void UninstallSelected()
 	{
-		var mods = InstalledList.GetSelectedItems().Select(s => Instance.Fabric.Mods[s]);
+		var mods = InstalledList.GetSelectedItems()
+			.Where(s => s >= 0 && s < Instance.Fabric.Mods.Count)
+			.Select(s => Instance.Fabric.Mods[s]);
 
 		void UninstallMod(Mod m)
 		{
-			foreach(var di in m.Dependencies)
+			foreach (var di in m.Dependencies)
 			{
-				var d = Instance.Fabric.Mods.First(m=>m.ProjectID == di.ProjectID);
+				var d = Instance.Fabric.Mods.FirstOrDefault(m => m.ProjectID == di.ProjectID);
+				if (d == null) continue;
+
 				d.DependsOn.Remove(m.ProjectID);
 
-				if(!d.DependsOn.Any())
+				if (!d.DependsOn.Any())
 					UninstallMod(d);
 			}
 
@@ -247,9 +281,9 @@ public partial class Modding : ColorRect
 			Instance.Fabric.Mods.Remove(m);
 		}
 
-		foreach(var m in mods)
+		foreach (var m in mods)
 			UninstallMod(m);
-		
+
 		await Instance.Save();
 
 		OnFabricInstalled();

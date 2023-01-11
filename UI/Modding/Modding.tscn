@@ -121,7 +121,7 @@ layout_mode = 2
 
 [node name="Spinner" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer/Control" instance=ExtResource("2_5jidv")]
 position = Vector2(32, 32)
-rotation = 111704.0
+rotation = 135792.0
 
 [node name="Button" type="Button" parent="."]
 custom_minimum_size = Vector2(32, 32)
