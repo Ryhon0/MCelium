@@ -65,7 +65,7 @@ size_flags_vertical = 4
 
 [node name="Spinner" parent="ColorRect/TabContainer/TextPage/Control" instance=ExtResource("1_nc4mq")]
 position = Vector2(24, 24)
-rotation = 136660.0
+rotation = 145547.0
 Speed = 4.0
 
 [node name="AuthenticationPage" type="VBoxContainer" parent="ColorRect/TabContainer"]

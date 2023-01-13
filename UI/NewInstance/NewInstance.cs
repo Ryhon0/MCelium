@@ -9,27 +9,34 @@ using SharpCompress.Common.Tar;
 using System.Collections.Generic;
 using SharpCompress.Archives.Zip;
 
-
 public partial class NewInstance : ColorRect
 {
 	[Export]
 	OptionButton VersionButton;
 	[Export]
-	Control InstallPage, ProgressPage;
+	Control InstallPage, ProgressPage, Spinner;
 	[Export]
 	Label InfoLabel, SubInfoLabel;
 	[Export]
 	Button DownloadButton;
 	[Export]
 	CheckBox Release, Snapshot, Alpha, Beta;
+	[Export]
+	ItemList ModpackList;
+
+	[Export]
+	Texture2D PlaceholderModpackIcon;
 
 	MinecraftManifest Manifest;
+	List<ModrinthProject> ModpackHits;
 
 	public override async void _Ready()
 	{
 		DownloadButton.Disabled = true;
-		Manifest = await MinecraftLauncher.GetManifest();
 
+		SearchModpacks("");
+
+		Manifest = await MinecraftLauncher.GetManifest();
 		PopulateVersionList();
 
 		DownloadButton.Disabled = false;
@@ -365,5 +372,121 @@ public partial class NewInstance : ColorRect
 					break;
 			}
 		}
+	}
+
+	async void SearchModpacks(string q)
+	{
+		ModpackList.Clear();
+
+		ModpackHits = (await Modrinth.Search(q, new (string, string)[] { ("project_type", "modpack"), ("categories", "fabric") }, limit: 50)).Hits;
+
+		foreach (var mp in ModpackHits)
+		{
+			var i = ModpackList.AddItem(mp.Title);
+			ModpackList.SetItemIcon(i, PlaceholderModpackIcon);
+
+			async void GetIcon()
+			{
+				ModpackList.SetItemIcon(i, (await WebCache.Get(mp.IconUrl)).LoadTexture(mp.IconUrl.Split('.').Last()) ?? PlaceholderModpackIcon);
+			}
+
+			GetIcon();
+		}
+	}
+
+	async void DownloadModpack()
+	{
+		var sel = ModpackList.GetSelectedItems();
+		if (sel.Length == 0) return;
+
+		var mp = ModpackHits[sel[0]];
+
+		InstallPage.Hide();
+		ProgressPage.Show();
+
+		InfoLabel.Text = "Downloading " + mp.Title + "...";
+
+		var ver = (await Modrinth.GetVersions(mp.ProjectID)).First(v=>v.Loaders.Contains("fabric"));
+
+		var f = ver.Files.FirstOrDefault(f => f.Primary) ?? ver.Files.First();
+
+		var mrpackStream = await new RequestBuilder(f.Url).Get<Stream>();
+		var mrpack = ZipArchive.Open(mrpackStream);
+
+		var ie = mrpack.Entries.First(e => e.Key == "modrinth.index.json");
+		var index = JsonSerializer.Deserialize<MRPackIndex>(ie.OpenEntryStream());
+
+		if (index.Dependencies.ContainsKey("forge"))
+		{
+			InfoLabel.Text = "Forge modpacks are currently not supported";
+			Spinner.Hide();
+			return;
+		}
+		if (index.Dependencies.ContainsKey("quilt-loader"))
+		{
+			InfoLabel.Text = "Quilt modpacks are currently not supported";
+			Spinner.Hide();
+			return;
+		}
+
+		// Download minecraft
+		var mcver = index.Dependencies["minecraft"];
+		{
+			SubInfoLabel.Text = "Downloading Minecraft " + mcver;
+
+			var lv = (await MinecraftLauncher.GetManifest()).Versions.First(v => v.Id == mcver);
+			var meta = await MinecraftLauncher.GetVersionMeta(lv.Url);
+		}
+
+		// Install fabric
+		{
+			var fabricver = index.Dependencies["fabric-loader"];
+			SubInfoLabel.Text = "Downloading Fabric " + fabricver;
+
+			var lmeta = await FabricMeta.GetLoader(mcver, fabricver);
+		}
+
+		// Extract overrides/ directory
+		{
+
+		}
+
+		// Download extra files
+		foreach (var inf in index.Files)
+		{
+			if (inf.Env != null)
+			{
+				if (inf.Env.ContainsKey("client") &&
+					inf.Env["client"] == "unsupported") continue;
+			}
+
+			SubInfoLabel.Text = "Downloading " + inf.Path;
+			// var s = await new RequestBuilder(inf.Downloads.Random()).Get<Stream>();
+			// var outf = File.OpenWrite(inf.Path);
+			// await s.CopyToAsync(outf);
+			// outf.Close();
+		}
+
+		// Download Fabric dependencies
+		foreach (var dep in ver.Dependencies)
+		{
+			if (dep.DependencyType != "required") continue;
+
+			if(dep.VersionId != null) 
+			{
+				// Download by version ID
+			}
+			else if(dep.ProjectId != null)
+			{
+				// Download latest mod version
+			}
+			else
+			{
+				if(File.Exists(dep.FileName))
+					GD.Print("Local dependency " + dep.FileName + " not found");
+			}
+		}
+
+		GetTree().ReloadCurrentScene();
 	}
 }

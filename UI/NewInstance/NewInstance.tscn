@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://bn8d3uovssa5k"]
+[gd_scene load_steps=4 format=3 uid="uid://bn8d3uovssa5k"]
 
 [ext_resource type="Script" path="res://UI/NewInstance/NewInstance.cs" id="1_e1ugu"]
+[ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://Assets/UI/circle_empty.svg" id="2_gpyqj"]
 [ext_resource type="PackedScene" path="res://UI/Spinner/Spinner.tscn" id="2_ykja3"]
 
-[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "InfoLabel", "SubInfoLabel", "DownloadButton", "Release", "Snapshot", "Alpha", "Beta")]
+[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "Spinner", "InfoLabel", "SubInfoLabel", "DownloadButton", "Release", "Snapshot", "Alpha", "Beta", "ModpackList")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,16 +12,19 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_e1ugu")
-VersionButton = NodePath("CenterContainer/VBoxContainer/OptionButton")
-InstallPage = NodePath("CenterContainer/VBoxContainer")
+VersionButton = NodePath("CenterContainer/HBoxContainer/VBoxContainer/OptionButton")
+InstallPage = NodePath("CenterContainer/HBoxContainer")
 ProgressPage = NodePath("CenterContainer/ProgressPage")
+Spinner = NodePath("CenterContainer/ProgressPage/CenterContainer")
 InfoLabel = NodePath("CenterContainer/ProgressPage/Info")
 SubInfoLabel = NodePath("CenterContainer/ProgressPage/Subinfo")
-DownloadButton = NodePath("CenterContainer/VBoxContainer/Button")
-Release = NodePath("CenterContainer/VBoxContainer/Release")
-Snapshot = NodePath("CenterContainer/VBoxContainer/Snapshot")
-Alpha = NodePath("CenterContainer/VBoxContainer/Alpha")
-Beta = NodePath("CenterContainer/VBoxContainer/Beta")
+DownloadButton = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Button")
+Release = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Release")
+Snapshot = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Snapshot")
+Alpha = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Alpha")
+Beta = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Beta")
+ModpackList = NodePath("CenterContainer/HBoxContainer/VBoxContainer2/ScrollContainer/ModpackList")
+PlaceholderModpackIcon = ExtResource("2_gpyqj")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -30,35 +34,70 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(200, 0)
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Version"
 
-[node name="Release" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+[node name="Release" type="CheckBox" parent="CenterContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 button_pressed = true
 text = "Release"
 
-[node name="Snapshot" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+[node name="Snapshot" type="CheckBox" parent="CenterContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Snapshot"
 
-[node name="Beta" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+[node name="Beta" type="CheckBox" parent="CenterContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Beta"
 
-[node name="Alpha" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+[node name="Alpha" type="CheckBox" parent="CenterContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Alpha"
 
-[node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
+[node name="OptionButton" type="OptionButton" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "release 2.0"
+popup/item_0/id = 0
+
+[node name="Button" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Download"
+
+[node name="VSeparator" type="VSeparator" parent="CenterContainer/HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Modpacks"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+
+[node name="ModpackList" type="ItemList" parent="CenterContainer/HBoxContainer/VBoxContainer2/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+fixed_icon_size = Vector2i(32, 32)
+
+[node name="Button" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
 text = "Download"
 
@@ -85,7 +124,7 @@ layout_mode = 2
 
 [node name="Spinner" parent="CenterContainer/ProgressPage/CenterContainer/Control" instance=ExtResource("2_ykja3")]
 position = Vector2(32, 32)
-rotation = 36653.2
+rotation = 70219.4
 
 [node name="Button" type="Button" parent="."]
 custom_minimum_size = Vector2(32, 32)
@@ -98,9 +137,10 @@ offset_bottom = 32.0
 grow_horizontal = 0
 text = "X"
 
-[connection signal="toggled" from="CenterContainer/VBoxContainer/Release" to="." method="OnReleaseTypeChanged"]
-[connection signal="toggled" from="CenterContainer/VBoxContainer/Snapshot" to="." method="OnReleaseTypeChanged"]
-[connection signal="toggled" from="CenterContainer/VBoxContainer/Beta" to="." method="OnReleaseTypeChanged"]
-[connection signal="toggled" from="CenterContainer/VBoxContainer/Alpha" to="." method="OnReleaseTypeChanged"]
-[connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="." method="Download"]
+[connection signal="toggled" from="CenterContainer/HBoxContainer/VBoxContainer/Release" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/HBoxContainer/VBoxContainer/Snapshot" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/HBoxContainer/VBoxContainer/Beta" to="." method="OnReleaseTypeChanged"]
+[connection signal="toggled" from="CenterContainer/HBoxContainer/VBoxContainer/Alpha" to="." method="OnReleaseTypeChanged"]
+[connection signal="pressed" from="CenterContainer/HBoxContainer/VBoxContainer/Button" to="." method="Download"]
+[connection signal="pressed" from="CenterContainer/HBoxContainer/VBoxContainer2/Button" to="." method="DownloadModpack"]
 [connection signal="pressed" from="Button" to="." method="queue_free"]

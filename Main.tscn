@@ -41,6 +41,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="HSplitContainer" type="HSplitContainer" parent="TabContainer/Instances"]
 offset_right = 1152.0
@@ -113,6 +115,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Skins"]
 offset_right = 765.0

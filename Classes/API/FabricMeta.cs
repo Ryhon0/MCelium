@@ -20,6 +20,12 @@ public static class FabricMeta
 		return await new RequestBuilder(RootUrl + "/v2/versions/loader/" + version)
 			.Get<List<FabricMetaLoaderVersion>>();
 	}
+
+	public static async Task<FabricMetaLoaderVersion> GetLoader(string minecraftversion, string fabricVersion)
+	{
+		return await new RequestBuilder(RootUrl + "/v2/versions/loader/" + minecraftversion + "/" + fabricVersion)
+			.Get<FabricMetaLoaderVersion>();
+	}
 }
 
 public class FabricMetaGameVersion

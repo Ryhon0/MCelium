@@ -1,6 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public static class Utils
 {
@@ -40,6 +42,11 @@ public static class Utils
 		}
 
 		return ImageTexture.CreateFromImage(img);
+	}
 
+	public static T Random<T>(this IEnumerable<T> enumerable)
+	{
+		int index = new Random().Next(0, enumerable.Count());
+		return enumerable.ElementAt(index);
 	}
 }

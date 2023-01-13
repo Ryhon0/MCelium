@@ -132,7 +132,7 @@ public partial class Modding : ColorRect
 
 		SearchList.Clear();
 
-		var s = await Modrinth.Search(query, new (string, string)[] { ("versions", Instance.Meta.Id), ("categories", "fabric") }, limit: 50);
+		var s = await Modrinth.Search(query, new (string, string)[] { ("versions", Instance.Meta.Id), ("categories", "fabric"), ("project_type","mod") }, limit: 50);
 		Hits = s.Hits;
 
 		foreach (var m in Hits)
