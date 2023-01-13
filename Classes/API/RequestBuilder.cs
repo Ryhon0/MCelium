@@ -12,6 +12,7 @@ using System.Collections.Generic;
 public class RequestBuilder
 {
 	public static bool DebugPrint = false;
+	public static bool ForceHTTPS = true;
 
 	public string Url;
 	public Dictionary<string, string> QuerParameters = new();
@@ -62,6 +63,8 @@ public class RequestBuilder
 	public async Task<T> Send<T>(HttpMethod method, byte[] data = null, string mime = null)
 	{
 		var qurl = Url;
+		
+		if(ForceHTTPS) qurl = qurl.Replace("http://", "https://");
 
 		if (QuerParameters.Any())
 		{

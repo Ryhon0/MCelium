@@ -6,7 +6,7 @@ using System.Linq;
 
 public static class Utils
 {
-	public static string BytesToString(this long byteCount)
+	public static string SizeToString(this long byteCount)
 	{
 		string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 		if (byteCount == 0)

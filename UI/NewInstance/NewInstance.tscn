@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cc22p8mk6nvio" path="res://Assets/UI/circle_empty.svg" id="2_gpyqj"]
 [ext_resource type="PackedScene" path="res://UI/Spinner/Spinner.tscn" id="2_ykja3"]
 
-[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "Spinner", "InfoLabel", "SubInfoLabel", "DownloadButton", "Release", "Snapshot", "Alpha", "Beta", "ModpackList")]
+[node name="NewInstance" type="ColorRect" node_paths=PackedStringArray("VersionButton", "InstallPage", "ProgressPage", "Spinner", "InfoLabel", "SubInfoLabel", "ProgressLabel", "DownloadButton", "Release", "Snapshot", "Alpha", "Beta", "ModpackList", "ProgressBar")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -18,12 +18,14 @@ ProgressPage = NodePath("CenterContainer/ProgressPage")
 Spinner = NodePath("CenterContainer/ProgressPage/CenterContainer")
 InfoLabel = NodePath("CenterContainer/ProgressPage/Info")
 SubInfoLabel = NodePath("CenterContainer/ProgressPage/Subinfo")
+ProgressLabel = NodePath("CenterContainer/ProgressPage/ProgressText")
 DownloadButton = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Button")
 Release = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Release")
 Snapshot = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Snapshot")
 Alpha = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Alpha")
 Beta = NodePath("CenterContainer/HBoxContainer/VBoxContainer/Beta")
 ModpackList = NodePath("CenterContainer/HBoxContainer/VBoxContainer2/ScrollContainer/ModpackList")
+ProgressBar = NodePath("CenterContainer/ProgressPage/ProgressBar")
 PlaceholderModpackIcon = ExtResource("2_gpyqj")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
@@ -124,7 +126,19 @@ layout_mode = 2
 
 [node name="Spinner" parent="CenterContainer/ProgressPage/CenterContainer/Control" instance=ExtResource("2_ykja3")]
 position = Vector2(32, 32)
-rotation = 70219.4
+rotation = 108030.0
+
+[node name="ProgressBar" type="ProgressBar" parent="CenterContainer/ProgressPage"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+value = 30.0
+
+[node name="ProgressText" type="Label" parent="CenterContainer/ProgressPage"]
+visible = false
+layout_mode = 2
+text = "10MB/30MB"
+horizontal_alignment = 1
 
 [node name="Button" type="Button" parent="."]
 custom_minimum_size = Vector2(32, 32)
