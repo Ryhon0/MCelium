@@ -210,7 +210,7 @@ public partial class Modding : ColorRect
 					File = f.Filename,
 					Icon = p.IconUrl,
 					InstalledExplicitly = requiredBy == null,
-					Dependencies = v.Dependencies.Select(d => new ModDependency()
+					Dependencies = v.Dependencies.Where(d=>d.DependencyType=="required").Select(d => new ModDependency()
 					{
 						ProjectID = d.ProjectId,
 						Version = d.VersionId

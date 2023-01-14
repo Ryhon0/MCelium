@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://b3m7k6svg85ks"]
 
-[ext_resource type="Script" path="res://UI/Modding/Modding.cs" id="1_laql1"]
+[ext_resource type="Script" path="res://UI/Modding/Modding.cs" id="1_b3tuo"]
 [ext_resource type="PackedScene" path="res://UI/Spinner/Spinner.tscn" id="2_5jidv"]
 [ext_resource type="Texture2D" uid="uid://nljn8r65v65t" path="res://Assets/UI/circle.svg" id="2_43f2x"]
 [ext_resource type="Texture2D" uid="uid://dfsco5bpjl7ly" path="res://icon.png" id="3_68mj2"]
@@ -13,7 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.207843, 0.207843, 0.207843, 1)
-script = ExtResource("1_laql1")
+script = ExtResource("1_b3tuo")
 NoLoaderWarning = NodePath("NoLoaderWarning")
 Spinner = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer")
 InstallFabricButton = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/InstallFabric")
@@ -21,7 +21,6 @@ InstallerText = NodePath("NoLoaderWarning/CenterContainer/VBoxContainer/Label")
 SearchList = NodePath("TabContainer/Download/VBoxContainer/ItemList")
 InstalledList = NodePath("TabContainer/Installed/VBoxContainer/ItemList")
 InstalledPage = NodePath("TabContainer/Installed")
-PlaceholderModIcon = ExtResource("2_43f2x")
 
 [node name="TabContainer" type="TabContainer" parent="."]
 anchors_preset = 15
@@ -32,13 +31,10 @@ grow_vertical = 2
 tab_alignment = 1
 
 [node name="Download" type="HBoxContainer" parent="TabContainer"]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 31.0
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Download"]
 offset_right = 1152.0
@@ -65,19 +61,12 @@ offset_bottom = 617.0
 text = "Download selected"
 
 [node name="Installed" type="HBoxContainer" parent="TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
+visible = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Installed"]
-offset_right = 1152.0
-offset_bottom = 617.0
 size_flags_horizontal = 3
 
 [node name="ItemList" type="ItemList" parent="TabContainer/Installed/VBoxContainer"]
-offset_right = 1152.0
-offset_bottom = 582.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 select_mode = 1
@@ -93,9 +82,6 @@ item_3/text = "4"
 item_3/icon = ExtResource("4_u850a")
 
 [node name="Button" type="Button" parent="TabContainer/Installed/VBoxContainer"]
-offset_top = 586.0
-offset_right = 1152.0
-offset_bottom = 617.0
 text = "Uninstall selected"
 
 [node name="NoLoaderWarning" type="ColorRect" parent="."]
@@ -121,15 +107,10 @@ offset_right = 669.0
 offset_bottom = 354.0
 
 [node name="Label" type="Label" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
-offset_right = 186.0
-offset_bottom = 26.0
 text = "No mod loader installed"
 horizontal_alignment = 1
 
 [node name="InstallFabric" type="Button" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
-offset_top = 30.0
-offset_right = 186.0
-offset_bottom = 61.0
 text = "Install Fabric"
 
 [node name="CenterContainer" type="CenterContainer" parent="NoLoaderWarning/CenterContainer/VBoxContainer"]
@@ -144,7 +125,7 @@ offset_bottom = 64.0
 
 [node name="Spinner" parent="NoLoaderWarning/CenterContainer/VBoxContainer/CenterContainer/Control" instance=ExtResource("2_5jidv")]
 position = Vector2(32, 32)
-rotation = 136034.0
+rotation = 142059.0
 
 [node name="Button" type="Button" parent="."]
 custom_minimum_size = Vector2(32, 32)
