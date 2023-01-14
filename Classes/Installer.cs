@@ -314,7 +314,7 @@ public static class Installer
 
 			callback(new InstallerDownload()
 			{
-				Name = outfile.Split('/').Last()
+				Name = l.Name
 			});
 
 			var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
