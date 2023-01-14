@@ -16,7 +16,7 @@ public partial class Modding : ColorRect
 	[Export]
 	Control Spinner, InstallFabricButton;
 	[Export]
-	Label InstallerText;
+	Label InstallerLabel, InstallerSubLabel;
 	[Export]
 	ItemList SearchList, InstalledList;
 	[Export]
@@ -65,60 +65,43 @@ public partial class Modding : ColorRect
 	async void InstallFabric()
 	{
 		InstallFabricButton.Visible = false;
-		InstallerText.Text = "Getting loader";
+		InstallerLabel.Text = "Getting loader";
 		Spinner.Visible = true;
 
-		var ls = await FabricMeta.GetLoaders(Instance.Id);
+		var ls = await FabricMeta.GetLoaders(Instance.Version.Id);
 		var l = ls.FirstOrDefault(l => l.Loader.Stable);
 
 		if (l == null)
 		{
-			InstallerText.Text = "Fabric is not available for this version";
+			InstallerLabel.Text = "Fabric is not available for this version";
 			Spinner.Visible = false;
 			return;
 		}
 
-		Directory.CreateDirectory(Instance.GetFabricDirectory());
-
-		var fi = new InstanceFabricInfo()
+		InstallerStatus status = InstallerStatus.Invalid;
+		Instance.Fabric = await Installer.DownloadFabric(Instance, l, (o)=>
 		{
-			Version = l.Loader.Version,
-			LauncherMeta = l.LauncherMeta
-		};
+			Dictionary<InstallerStatus, string> dict = new()
+			{
+				[InstallerStatus.FabricDownloadingLoader] = "Downloading Fabric loader",
+				[InstallerStatus.FabricDownloadingLibraries] = "Downloading libraries",
+			};
 
+			if (o is InstallerStatus s)
+			{
+				status = s;
 
-		async Task DownloadLib(FabricMetaLibrary l)
-		{
-			fi.Libraries.Add(l.Name);
+				if (dict.ContainsKey(status)) InstallerLabel.Text = dict[status];
+				else InstallerLabel.Text = status.ToString();
+			}
 
-			var outfile = Instance.GetFabricDirectory() + "/" + l.Name.Replace(':', '-').Replace(".", "-") + ".jar";
+			if (o is InstallerDownload d)
+			{
+				if (d.Size != 0) InstallerSubLabel.Text = $"{d.Name} ({d.Size.SizeToString()})";
+				else InstallerSubLabel.Text = d.Name;
+			}
+		});
 
-			if (File.Exists(outfile)) return;
-
-			var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
-			var f = File.OpenWrite(outfile);
-			await s.CopyToAsync(f);
-			f.Close();
-		}
-
-		InstallerText.Text = "Downloading loader";
-		// Download Loader
-		{
-			await DownloadLib(new FabricMetaLibrary() { Name = l.Loader.Maven, Url = FabricMeta.MavenUrl });
-			await DownloadLib(new FabricMetaLibrary() { Name = l.Intermediary.Maven, Url = FabricMeta.MavenUrl });
-		}
-
-		InstallerText.Text = "Downloading libraries";
-		// Download libraries
-		{
-			foreach (var lib in l.LauncherMeta.Libraries.Client)
-				await DownloadLib(lib);
-
-			foreach (var lib in l.LauncherMeta.Libraries.Common)
-				await DownloadLib(lib);
-		}
-
-		Instance.Fabric = fi;
 		await Instance.Save();
 
 		OnFabricInstalled();

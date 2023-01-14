@@ -293,6 +293,55 @@ public static class Installer
 			}
 		}
 	}
+
+	public static async Task<InstanceFabricInfo> DownloadFabric(Instance instance, FabricMetaLoaderVersion l, Action<object> callback)
+	{
+		Directory.CreateDirectory(instance.GetFabricDirectory());
+
+		var fi = new InstanceFabricInfo()
+		{
+			Version = l.Loader.Version,
+			LauncherMeta = l.LauncherMeta
+		};
+
+
+		async Task DownloadLib(FabricMetaLibrary l)
+		{
+			fi.Libraries.Add(l.Name);
+
+			var outfile = instance.GetFabricDirectory() + "/" + l.Name.Replace(':', '-').Replace(".", "-") + ".jar";
+			if (File.Exists(outfile)) return;
+
+			callback(new InstallerDownload()
+			{
+				Name = outfile.Split('/').Last()
+			});
+
+			var s = await new RequestBuilder(l.GetDownloadUrl()).Get<Stream>();
+			var f = File.OpenWrite(outfile);
+			await s.CopyToAsync(f);
+			f.Close();
+		}
+
+		callback(InstallerStatus.FabricDownloadingLoader);
+		// Download Loader
+		{
+			await DownloadLib(new FabricMetaLibrary() { Name = l.Loader.Maven, Url = FabricMeta.MavenUrl });
+			await DownloadLib(new FabricMetaLibrary() { Name = l.Intermediary.Maven, Url = FabricMeta.MavenUrl });
+		}
+
+		callback(InstallerStatus.FabricDownloadingLibraries);
+		// Download libraries
+		{
+			foreach (var lib in l.LauncherMeta.Libraries.Client)
+				await DownloadLib(lib);
+
+			foreach (var lib in l.LauncherMeta.Libraries.Common)
+				await DownloadLib(lib);
+		}
+
+		return fi;
+	}
 }
 
 public class InstallerDownload
@@ -311,5 +360,8 @@ public enum InstallerStatus
 	DownloadingAssets,
 	DownloadingClient,
 	DownloadingLibraries,
-	DownloadingJava
+	DownloadingJava,
+
+	FabricDownloadingLoader,
+	FabricDownloadingLibraries,
 }
