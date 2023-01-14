@@ -88,8 +88,10 @@ public partial class NewInstance : ColorRect
 
 			if (o is InstallerDownload d)
 			{
-				SubInfoLabel.Text = $"{d.Name} ({d.Size.SizeToString()})";
-				if(d.TotalSize > 0)
+				if (d.Size != 0) SubInfoLabel.Text = $"{d.Name} ({d.Size.SizeToString()})";
+				else SubInfoLabel.Text = d.Name;
+
+				if (d.TotalSize > 0)
 				{
 					ProgressBar.Show();
 					ProgressLabel.Show();
