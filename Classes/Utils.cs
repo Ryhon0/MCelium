@@ -49,4 +49,20 @@ public static class Utils
 		int index = new Random().Next(0, enumerable.Count());
 		return enumerable.ElementAt(index);
 	}
+
+	public static string GetRandomHexString(int count)
+	{
+		string s = "";
+		var r = new Random();
+
+		for(int i=0; i<count; i++)
+		{
+			byte[] b = new byte[1]; 
+			r.NextBytes(b);
+
+			s+= Convert.ToHexString(b).ToLower();
+		}
+
+		return s;
+	}
 }

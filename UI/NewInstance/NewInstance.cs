@@ -25,6 +25,8 @@ public partial class NewInstance : ColorRect
 	ItemList ModpackList;
 	[Export]
 	ProgressBar ProgressBar;
+	[Export]
+	LineEdit InstanceName;
 
 	[Export]
 	Texture2D PlaceholderModpackIcon;
@@ -53,11 +55,12 @@ public partial class NewInstance : ColorRect
 
 		var v = GetFilteredVersions().ToList()[VersionButton.Selected];
 		var meta = await MinecraftLauncher.GetVersionMeta(v.Url);
+		var name = string.IsNullOrEmpty(InstanceName.Text.Trim()) ? v.Id : InstanceName.Text.Trim();
 		var instance = new Instance()
 		{
-			Id = v.Id,
+			Id = Utils.GetRandomHexString(8),
 			Version = v,
-			Name = v.Id,
+			Name = name,
 			Meta = meta,
 		};
 

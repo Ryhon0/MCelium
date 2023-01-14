@@ -26,6 +26,8 @@ public partial class Main : Control
 	Control InstanceProperties;
 	[Export]
 	Label InstanceNameLabel;
+	[Export]
+	LineEdit IdLabel;
 
 	[Export]
 	PackedScene MSAPopupScene, NewInstanceScene, ModsScene;
@@ -79,6 +81,7 @@ public partial class Main : Control
 		var i = Instances[idx];
 
 		InstanceNameLabel.Text = i.Name;
+		IdLabel.Text = i.Id;
 	}
 
 	void PlaySelected()
@@ -106,6 +109,8 @@ public partial class Main : Control
 
 		InstanceList.RemoveItem(id);
 		Instances.Remove(i);
+
+		InstanceProperties.Hide();
 	}
 
 	void OnInstanceActivated(int idx)
