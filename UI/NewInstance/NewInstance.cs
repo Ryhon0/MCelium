@@ -80,10 +80,10 @@ public partial class NewInstance : ColorRect
 
 			if (o is InstallerStatus s)
 			{
+				status = s;
+
 				if (dict.ContainsKey(status)) InfoLabel.Text = dict[status];
 				else InfoLabel.Text = status.ToString();
-
-				status = s;
 			}
 
 			if (o is InstallerDownload d)
