@@ -16,7 +16,6 @@ public static class Installer
 		var meta = instance.Meta;
 		var objectsdir = Paths.AssetsObjects;
 		var indexesdir = Paths.AssetsIndexes;
-		var instancedir = instance.GetDirectory();
 		var mcdir = instance.GetMinecraftDirectory();
 
 		Directory.CreateDirectory(objectsdir);
@@ -429,6 +428,146 @@ public static class Installer
 			await InstallMod(m.p, m.v);
 		}
 	}
+
+	public static async Task<Instance> DownloadModpack(ModrinthProject mp, Action<object> callback)
+	{
+		var instance = new Instance()
+		{
+			Id = Utils.GetRandomHexString(8)
+		};
+
+		callback(ModpackInstallerStatus.DownloadingModpack);
+
+		var ver = (await Modrinth.GetVersions(mp.ProjectID)).First(v => v.Loaders.Contains("fabric"));
+		var f = ver.Files.FirstOrDefault(f => f.Primary) ?? ver.Files.First();
+
+		var mrpackStream = await new RequestBuilder(f.Url).Get<Stream>();
+		var mrpack = ZipArchive.Open(mrpackStream);
+
+		var ie = mrpack.Entries.First(e => e.Key == "modrinth.index.json");
+		var index = JsonSerializer.Deserialize<MRPackIndex>(ie.OpenEntryStream());
+		instance.Name = index.Name;
+
+		if (index.Dependencies.ContainsKey("forge"))
+		{
+			throw new Exception("Forge modpacks are currently not supported");
+		}
+		if (index.Dependencies.ContainsKey("quilt-loader"))
+		{
+			throw new Exception("Quilt modpacks are currently not supported");
+		}
+
+		callback(ModpackInstallerStatus.DownloadingMinecraft);
+		// Download minecraft
+		var mcver = index.Dependencies["minecraft"];
+		{
+			// SubInfoLabel.Text = "Downloading Minecraft " + mcver;
+
+			instance.Version = (await MinecraftLauncher.GetManifest()).Versions.First(v => v.Id == mcver);
+			instance.Meta = await MinecraftLauncher.GetVersionMeta(instance.Version.Url);
+
+			await Installer.DownloadVersion(instance, (o) => callback(o));
+		}
+
+		callback(ModpackInstallerStatus.DownloadingFabric);
+		// Install fabric
+		{
+			var fabricver = index.Dependencies["fabric-loader"];
+			var lmeta = await FabricMeta.GetLoader(mcver, fabricver);
+
+			instance.Fabric = await Installer.DownloadFabric(instance, lmeta, (o => callback(o)));
+		}
+
+		callback(ModpackInstallerStatus.ExtractingOverrides);
+		// Extract overrides/ directory
+		foreach (var e in mrpack.Entries.Where(e => e.Key.StartsWith("overrides/") && !e.IsDirectory))
+		{
+			var outpath = Path.GetFullPath(instance.GetMinecraftDirectory() + "/" + e.Key["overrides/".Length..]);
+
+			if (!outpath.StartsWith(instance.GetMinecraftDirectory() + "/"))
+			{
+				// Modpack tried to extract files outside the .minecraft directory!!!!!
+				continue;
+			}
+
+			var estream = e.OpenEntryStream();
+			Directory.CreateDirectory(Path.GetDirectoryName(outpath));
+
+			var fs = File.OpenWrite(outpath);
+			await estream.CopyToAsync(fs);
+			fs.Close();
+		}
+
+		callback(ModpackInstallerStatus.DownloadingAdditionalFiles);
+		// Download extra files
+		foreach (var inf in index.Files)
+		{
+			if (inf.Env != null)
+			{
+				if (inf.Env.ContainsKey("client") &&
+					inf.Env["client"] == "unsupported") continue;
+			}
+
+			var outpath = Path.GetFullPath(instance.GetMinecraftDirectory() + "/" + inf.Path);
+			if (!outpath.StartsWith(instance.GetMinecraftDirectory() + "/"))
+			{
+				// Modpack tried to extract files outside the .minecraft directory!!!!!
+				continue;
+			}
+			Directory.CreateDirectory(Path.GetDirectoryName(outpath));
+
+			callback(new InstallerDownload()
+			{
+				Name = inf.Path,
+				Size = inf.FileSize
+			});
+
+			var s = await new RequestBuilder(inf.Downloads.Random()).Get<Stream>();
+
+			var fs = File.OpenWrite(outpath);
+			await s.CopyToAsync(fs);
+			fs.Close();
+		}
+
+		callback(ModpackInstallerStatus.DownloadingMods);
+		// Download Fabric dependencies
+
+		List<(ModrinthProject p, ModrinthModVersion v)> mods = new();
+		foreach (var d in ver.Dependencies)
+		{
+			if (d.DependencyType != "required" && d.DependencyType != "embedded") continue;
+
+			ModrinthProject p = null;
+			ModrinthModVersion v = null;
+
+			if (d.VersionId == null && d.ProjectId == null) continue;
+
+				v = await Modrinth.GetVersion(d.VersionId);
+			p = await Modrinth.GetProject(v.ProjectId);
+
+			if (p == null || v == null) continue;
+
+			if (d.DependencyType == "required")
+				mods.Add((p, v));
+			else if (d.DependencyType == "embedded")
+			{
+				instance.Fabric.Mods.Add(new Mod()
+				{
+					Name = p.Title,
+					ProjectID = p.ProjectID,
+					Icon = p.IconUrl,
+					Version = v.Id,
+					File = v.Files.First().Filename,
+					InstalledExplicitly = true,
+
+					// TODO: Dependencies and DependsOn
+				});
+			}
+		}
+		await Installer.DownloadMods(instance, mods, (o) => callback(o));
+
+		return instance;
+	}
 }
 
 public class InstallerDownload
@@ -451,4 +590,15 @@ public enum InstallerStatus
 
 	FabricDownloadingLoader,
 	FabricDownloadingLibraries,
+}
+
+public enum ModpackInstallerStatus
+{
+	Invalid,
+	DownloadingModpack,
+	DownloadingMinecraft,
+	DownloadingFabric,
+	DownloadingMods,
+	ExtractingOverrides,
+	DownloadingAdditionalFiles,
 }

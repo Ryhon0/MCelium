@@ -23,7 +23,7 @@ Cross-platform gamepad friendly launcher for Minecraft Java and Bedrock Edition.
 	- [x] Downloading dependencies
 	- [ ] Managing multiple dependency versions  
 	- [ ] Updating mods
-- [ ] Installing modpacks from Modrinth  
+- [x] Installing modpacks from Modrinth  
 - [ ] Installing resourcepacks from Modrinth  
 
 ## Bedrock Edition

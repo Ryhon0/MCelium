@@ -194,88 +194,50 @@ public partial class NewInstance : ColorRect
 		InstallPage.Hide();
 		ProgressPage.Show();
 
+		Instance i = null;
 		InfoLabel.Text = "Downloading " + mp.Title + "...";
-
-		var ver = (await Modrinth.GetVersions(mp.ProjectID)).First(v => v.Loaders.Contains("fabric"));
-
-		var f = ver.Files.FirstOrDefault(f => f.Primary) ?? ver.Files.First();
-
-		var mrpackStream = await new RequestBuilder(f.Url).Get<Stream>();
-		var mrpack = ZipArchive.Open(mrpackStream);
-
-		var ie = mrpack.Entries.First(e => e.Key == "modrinth.index.json");
-		var index = JsonSerializer.Deserialize<MRPackIndex>(ie.OpenEntryStream());
-
-		if (index.Dependencies.ContainsKey("forge"))
+		try
 		{
-			InfoLabel.Text = "Forge modpacks are currently not supported";
+			i = await Installer.DownloadModpack(mp, (o) =>
+			{
+				GD.Print(o);
+				if (o is InstallerDownload d)
+				{
+					if (d.Size != 0) SubInfoLabel.Text = $"{d.Name} ({d.Size.SizeToString()})";
+					else SubInfoLabel.Text = d.Name;
+
+					if (d.TotalSize > 0)
+					{
+						ProgressBar.Show();
+						ProgressLabel.Show();
+						Spinner.Hide();
+
+						ProgressBar.MinValue = 0;
+						ProgressBar.MaxValue = d.TotalSize;
+						ProgressBar.Value = d.Progress;
+
+						ProgressLabel.Text = $"{d.Progress.SizeToString()}/{d.TotalSize.SizeToString()}";
+					}
+					else
+					{
+						ProgressBar.Hide();
+						ProgressLabel.Hide();
+						Spinner.Show();
+					}
+				}
+			});
+		}
+		catch (Exception e)
+		{
 			Spinner.Hide();
+			InfoLabel.Text = e.ToString();
 			return;
 		}
-		if (index.Dependencies.ContainsKey("quilt-loader"))
-		{
-			InfoLabel.Text = "Quilt modpacks are currently not supported";
-			Spinner.Hide();
-			return;
-		}
 
-		// Download minecraft
-		var mcver = index.Dependencies["minecraft"];
-		{
-			SubInfoLabel.Text = "Downloading Minecraft " + mcver;
+		if (!string.IsNullOrEmpty(InstanceName.Text.Trim()))
+			i.Name = InstanceName.Text;
 
-			var lv = (await MinecraftLauncher.GetManifest()).Versions.First(v => v.Id == mcver);
-			var meta = await MinecraftLauncher.GetVersionMeta(lv.Url);
-		}
-
-		// Install fabric
-		{
-			var fabricver = index.Dependencies["fabric-loader"];
-			SubInfoLabel.Text = "Downloading Fabric " + fabricver;
-
-			var lmeta = await FabricMeta.GetLoader(mcver, fabricver);
-		}
-
-		// Extract overrides/ directory
-		{
-
-		}
-
-		// Download extra files
-		foreach (var inf in index.Files)
-		{
-			if (inf.Env != null)
-			{
-				if (inf.Env.ContainsKey("client") &&
-					inf.Env["client"] == "unsupported") continue;
-			}
-
-			SubInfoLabel.Text = "Downloading " + inf.Path;
-			// var s = await new RequestBuilder(inf.Downloads.Random()).Get<Stream>();
-			// var outf = File.OpenWrite(inf.Path);
-			// await s.CopyToAsync(outf);
-			// outf.Close();
-		}
-
-		// Download Fabric dependencies
-		foreach (var dep in ver.Dependencies)
-		{
-			if (dep.DependencyType != "required") continue;
-
-			if (dep.VersionId != null)
-			{
-				// Download by version ID
-			}
-			else if (dep.ProjectId != null)
-			{
-				// Download latest mod version
-			}
-			else
-			{
-				if (File.Exists(dep.FileName))
-					GD.Print("Local dependency " + dep.FileName + " not found");
-			}
-		}
+		await i.Save();
 
 		GetTree().ReloadCurrentScene();
 	}
