@@ -342,6 +342,93 @@ public static class Installer
 
 		return fi;
 	}
+
+	public static async Task DownloadMods(Instance instance, IEnumerable<(ModrinthProject p, ModrinthModVersion v)> mods, Action<object> callback)
+	{
+
+		async Task InstallMod(ModrinthProject p, ModrinthModVersion v, string requiredBy = null)
+		{
+			p = p ?? await Modrinth.GetProject(v.ProjectId);
+
+			if (instance.Fabric.Mods.Any(im => im.ProjectID == p.ProjectID))
+			{
+				// GD.Print(p.ProjectID + " already installed, skipping");
+
+				if (requiredBy != null)
+				{
+					instance.Fabric.Mods.First(m => m.ProjectID == p.ProjectID).DependsOn.Add(requiredBy);
+				}
+
+				return;
+			}
+
+			if (v == null)
+			{
+				v = (await Modrinth.GetVersions(p.ProjectID))
+				.First(v => v.GameVersions.Contains(instance.Version.Id) &&
+						v.Loaders.Contains("fabric"));
+			}
+
+			foreach (var d in v.Dependencies)
+			{
+				switch (d.DependencyType)
+				{
+					case "required":
+						if (d.ProjectId != null) await InstallMod(await Modrinth.GetProject(d.ProjectId), null, p.ProjectID);
+						else await InstallMod(null, await Modrinth.GetVersion(d.VersionId), p.ProjectID);
+						break;
+					case "incompatible":
+						var icm = instance.Fabric.Mods.FirstOrDefault(m => m.ProjectID == d.ProjectId);
+						if (icm != null)
+						{
+							// GD.Print($"{p.Title} is incopatible with {icm.Name}, not installing");
+							continue;
+						}
+						break;
+					case "embedded":
+						// TODO: handle this
+						// GD.Print($"{p.Title} provides {d.ProjectId}");
+						break;
+				}
+			}
+
+			var f = v.Files.First();
+
+			callback(new InstallerDownload()
+			{
+				Name = p.Title,
+				Size = f.Size
+			});
+
+			var mi = new Mod()
+			{
+				Name = p.Title,
+				ProjectID = p.ProjectID,
+				Version = v.Id,
+				File = f.Filename,
+				Icon = p.IconUrl,
+				InstalledExplicitly = requiredBy == null,
+				Dependencies = v.Dependencies.Where(d => d.DependencyType == "required").Select(d => new ModDependency()
+				{
+					ProjectID = d.ProjectId,
+					Version = d.VersionId
+				}).ToList()
+			};
+			if (requiredBy != null) mi.DependsOn = new List<string>() { requiredBy };
+
+			var js = await new RequestBuilder(f.Url).Get<Stream>();
+			var fs = File.OpenWrite(instance.GetModsDirectory() + "/" + f.Filename);
+			await js.CopyToAsync(fs);
+			fs.Close();
+
+			instance.Fabric.Mods.Add(mi);
+		}
+
+		foreach (var m in mods)
+		{
+			await InstallMod(m.p, m.v);
+		}
+	}
 }
 
 public class InstallerDownload

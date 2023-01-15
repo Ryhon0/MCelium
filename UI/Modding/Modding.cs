@@ -153,88 +153,14 @@ public partial class Modding : ColorRect
 		// There's probably a proper way to do this but I forgor
 		var mods = SearchList.GetSelectedItems().Select(s => Hits[s]);
 
-		async Task InstallMod(string projectId, string requiredBy = null)
+		await Installer.DownloadMods(Instance, mods.Select(m=>(m, (ModrinthModVersion)null)), (o) =>
 		{
-			async Task InstallVersion(ModrinthProject p, ModrinthModVersion v, string requiredBy = null)
+			if(o is InstallerDownload d)
 			{
-				p = p ?? await Modrinth.GetProject(v.ProjectId);
-
-				foreach (var d in v.Dependencies)
-				{
-					switch (d.DependencyType)
-					{
-						case "required":
-							if (d.ProjectId != null) await InstallMod(d.ProjectId, projectId);
-							else await InstallVersion(null, await Modrinth.GetVersion(d.VersionId), projectId);
-							break;
-						case "incompatible":
-							var icm = Instance.Fabric.Mods.FirstOrDefault(m => m.ProjectID == d.ProjectId);
-							if (icm != null)
-							{
-								GD.Print($"{p.Title} is incopatible with {icm.Name}, not installing");
-								continue;
-							}
-							break;
-						case "embedded":
-							// TODO: handle this
-							GD.Print($"{p.Title} provides {d.ProjectId}");
-							break;
-					}
-				}
-
-				var f = v.Files.First();
-				GD.Print(f.Filename);
-
-				var mi = new Mod()
-				{
-					Name = p.Title,
-					ProjectID = projectId,
-					Version = v.Id,
-					File = f.Filename,
-					Icon = p.IconUrl,
-					InstalledExplicitly = requiredBy == null,
-					Dependencies = v.Dependencies.Where(d=>d.DependencyType=="required").Select(d => new ModDependency()
-					{
-						ProjectID = d.ProjectId,
-						Version = d.VersionId
-					}).ToList()
-				};
-				if (requiredBy != null) mi.DependsOn = new List<string>() { requiredBy };
-
-				var js = await new RequestBuilder(f.Url).Get<Stream>();
-				var fs = File.OpenWrite(Instance.GetModsDirectory() + "/" + f.Filename);
-				await js.CopyToAsync(fs);
-				fs.Close();
-
-				Instance.Fabric.Mods.Add(mi);
+				GD.Print($"{d.Name} ({d.Size.SizeToString()})");
 			}
-
-			if (Instance.Fabric.Mods.Any(im => im.ProjectID == projectId))
-			{
-				GD.Print(projectId + " already installed, skipping");
-
-				if (requiredBy != null)
-				{
-					Instance.Fabric.Mods.First(m => m.ProjectID == projectId).DependsOn.Add(requiredBy);
-				}
-
-				return;
-			}
-
-			GD.Print("Downloading " + projectId);
-			var p = await Modrinth.GetProject(projectId);
-			var v = (await Modrinth.GetVersions(projectId))
-				.First(v => v.GameVersions.Contains(Instance.Version.Id) &&
-						v.Loaders.Contains("fabric"));
-
-			await InstallVersion(p, v, requiredBy);
-		}
-
-		foreach (var m in mods)
-		{
-			await InstallMod(m.ProjectID);
-		}
-
+		});
+		
 		GD.Print("Done");
 		OnFabricInstalled();
 
