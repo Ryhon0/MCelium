@@ -121,26 +121,55 @@ public static class Installer
 		{
 			callback(InstallerStatus.DownloadingLibraries);
 
-			foreach (var lib in meta.Libraries)
+			long totalSize = 0;
+			long progress = 0;
+			var libs = meta.Libraries.Where(l =>
+			{
+				if (l.Downloads.Artifact != null)
+				{
+					if (l.Rules != null)
+					{
+						var allow = !l.Rules.Select(r => r.Allowed(osName, null, archName, features))
+							.Any(r => !r);
+						if (!allow) return false;
+					}
+
+					totalSize += l.Downloads.Artifact.Size;
+				}
+
+				if (l.Natives != null)
+				{
+					var natives = l.Natives;
+					if (natives.ContainsKey(osName))
+					{
+						var classifiersName = (string)natives[osName];
+						if (l.Downloads.Classifiers.ContainsKey(classifiersName))
+						{
+							var classifier = l.Downloads.Classifiers[classifiersName];
+							totalSize += classifier.Size;
+						}
+					}
+
+				}
+
+				return true;
+			});
+
+			foreach (var lib in libs.OrderByDescending(l =>).ToList())
 			{
 				if (lib.Downloads.Artifact != null)
 				{
 					var outpath = mcdir + "/libs/" + lib.Downloads.Artifact.Path;
 					var dlurl = lib.Downloads.Artifact.Url;
 
-					if (lib.Rules != null)
-					{
-						var allow = !lib.Rules.Select(r => r.Allowed(osName, null, archName, features))
-							.Any(r => !r);
-						if (!allow) continue;
-					}
-
 					if (!System.IO.File.Exists(outpath))
 					{
 						callback(new InstallerDownload()
 						{
 							Name = outpath.Split('/').Last(),
-							Size = lib.Downloads.Artifact.Size
+							Size = lib.Downloads.Artifact.Size,
+							TotalSize = totalSize,
+							Progress = progress
 						});
 
 						var fi = new System.IO.FileInfo(outpath);
@@ -150,6 +179,8 @@ public static class Installer
 						var f = System.IO.File.OpenWrite(outpath);
 						await dat.CopyToAsync(f);
 						f.Close();
+
+						progress += lib.Downloads.Artifact.Size;
 					}
 				}
 
@@ -167,7 +198,9 @@ public static class Installer
 							callback(new InstallerDownload()
 							{
 								Name = classifier.Path.Split('/').Last(),
-								Size = classifier.Size
+								Size = classifier.Size,
+								TotalSize = totalSize,
+								Progress = progress
 							});
 
 							var url = classifier.Url;
@@ -201,6 +234,8 @@ public static class Installer
 								await s.CopyToAsync(f);
 								f.Close();
 							}
+
+							progress += classifier.Size;
 						}
 					}
 				}
@@ -542,7 +577,7 @@ public static class Installer
 
 			if (d.VersionId == null && d.ProjectId == null) continue;
 
-				v = await Modrinth.GetVersion(d.VersionId);
+			v = await Modrinth.GetVersion(d.VersionId);
 			p = await Modrinth.GetProject(v.ProjectId);
 
 			if (p == null || v == null) continue;
