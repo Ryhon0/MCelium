@@ -160,7 +160,7 @@ public static class Installer
 				return true;
 			});
 
-			foreach (var lib in libs.OrderByDescending(l =>).ToList())
+			foreach (var lib in libs.ToList())
 			{
 				if (lib.Downloads.Artifact != null)
 				{
