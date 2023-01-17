@@ -96,6 +96,11 @@ public static class Installer
 		// Download client jar
 		{
 			callback(InstallerStatus.DownloadingClient);
+			callback(new InstallerDownload()
+			{
+				Name = "client.jar",
+				Size = meta.Downloads.Client.Size
+			});
 
 			var url = meta.Downloads.Client.Url;
 
