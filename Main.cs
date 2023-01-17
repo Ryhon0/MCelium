@@ -101,6 +101,11 @@ public partial class Main : Control
 		AddChild(m);
 	}
 
+	void OpenSelectedDirectory()
+	{
+		OS.ShellOpen(Instances[InstanceList.GetSelectedItems()[0]].GetDirectory());
+	}
+
 	void UninstallSelected()
 	{
 		var id = InstanceList.GetSelectedItems()[0];

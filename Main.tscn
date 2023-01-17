@@ -83,9 +83,13 @@ text = "Play"
 icon = ExtResource("7_eygvr")
 expand_icon = true
 
-[node name="Button" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
+[node name="Mods" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
 layout_mode = 2
 text = "Mods"
+
+[node name="OpenDir" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
+layout_mode = 2
+text = "Open Directory"
 
 [node name="Uninstall" type="Button" parent="TabContainer/Instances/HSplitContainer/InstanceProperties"]
 layout_mode = 2
@@ -133,5 +137,6 @@ layout_mode = 2
 [connection signal="item_activated" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceActivated"]
 [connection signal="item_selected" from="TabContainer/Instances/HSplitContainer/ScrollContainer/InstanceList" to="." method="OnInstanceSelected"]
 [connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Play" to="." method="PlaySelected"]
-[connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Button" to="." method="ShowModsScreen"]
+[connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Mods" to="." method="ShowModsScreen"]
+[connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/OpenDir" to="." method="OpenSelectedDirectory"]
 [connection signal="pressed" from="TabContainer/Instances/HSplitContainer/InstanceProperties/Uninstall" to="." method="UninstallSelected"]
