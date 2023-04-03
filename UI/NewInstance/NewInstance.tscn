@@ -134,7 +134,7 @@ layout_mode = 2
 
 [node name="Spinner" parent="CenterContainer/ProgressPage/CenterContainer/Control" instance=ExtResource("2_ykja3")]
 position = Vector2(32, 32)
-rotation = 195056.0
+rotation = 203486.0
 
 [node name="ProgressBar" type="ProgressBar" parent="CenterContainer/ProgressPage"]
 visible = false

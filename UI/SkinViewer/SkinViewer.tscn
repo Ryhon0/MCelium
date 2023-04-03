@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://n1fikm7pgfeo"]
 
 [ext_resource type="Script" path="res://UI/SkinViewer/SkinViewer.cs" id="1_g1o6a"]
-[ext_resource type="PackedScene" uid="uid://62cjsn2ruii5" path="res://Assets/Models/player_rigged.glb" id="1_o0lkl"]
+[ext_resource type="PackedScene" uid="uid://ckppxlqxk6cws" path="res://Assets/Models/player_rigged.glb" id="1_o0lkl"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lsegj"]
 
@@ -36,6 +36,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
 [node name="Camera3D" type="Camera3D" parent="SubViewport/CameraArm"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32)
 current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport/CameraArm"]
+transform = Transform3D(0.338399, -0.586125, 0.736168, 0.541662, 0.761047, 0.356944, -0.769473, 0.277964, 0.57502, 19, 0, 23)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport"]
 environment = SubResource("Environment_xdokb")

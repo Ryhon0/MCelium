@@ -1,7 +1,10 @@
 using Godot;
+using System.IO;
 using Godot.Collections;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.Net.Http;
+using System.Text.Json;
 
 public static class Minecraft
 {
@@ -14,7 +17,7 @@ public static class Minecraft
 
 		return await new RequestBuilder("https://api.minecraftservices.com/authentication/login_with_xbox")
 			.Header("Accept","application/json")
-			.PostJson<MinecraftLogInResult>(JSON.Stringify(reqJson));
+			.PostJson<MinecraftLogInResult>(Json.Stringify(reqJson));
 	}
 
 	public static async Task<MinecraftProfile> GetProfile(string token)
@@ -23,6 +26,36 @@ public static class Minecraft
 			.Header("Accept","application/json")
 			.Header("Authorization", "Bearer " + token)
 			.Get<MinecraftProfile>();
+	}
+
+	public static async Task ChangeSkin(string token, string variant, string url)
+	{
+		await new RequestBuilder("https://api.minecraftservices.com/minecraft/profile/skins")
+			.Header("Authorization", "Bearer " + token)
+			.PostJson<string>(JsonSerializer.Serialize(new {variant = variant, url = url}));
+	}
+
+	public static async Task ResetSkin(string token)
+	{
+		await new RequestBuilder("https://api.minecraftservices.com/minecraft/profile/skins/active")
+			.Header("Authorization", "Bearer " + token)
+			.Send<string>(HttpMethod.Delete, null, null);
+	}
+
+	public static async Task UploadSkin(string token, string variant, Stream data)
+	{
+		var mpf = new MultipartFormDataContent();
+		
+		mpf.Add(new StringContent(variant), "variant");
+		var ds = new MemoryStream();
+		mpf.Add(new ByteArrayContent(ds.GetBuffer()), "variant", "skin.png");
+		
+		var s = new MemoryStream();
+		await mpf.CopyToAsync(s);
+
+		await new RequestBuilder("https://api.minecraftservices.com/minecraft/profile/skins")
+			.Header("Authorization", "Bearer " + token)
+			.Post<string>(s.GetBuffer(), "multipart/form-data");
 	}
 }
 

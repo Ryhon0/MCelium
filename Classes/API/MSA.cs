@@ -55,11 +55,11 @@ public static class MSA
 
 		var jstr = await new RequestBuilder("https://user.auth.xboxlive.com/user/authenticate")
 			.Header("Accept","application/json")
-			.PostJson<string>(JSON.Stringify(reqJson));
+			.PostJson<string>(Json.Stringify(reqJson));
 
 		var loginresult = JsonSerializer.Deserialize<XboxLogInResult>(jstr);
 
-		var json = JSON.ParseString(jstr).AsGodotDictionary();
+		var json = Json.ParseString(jstr).AsGodotDictionary();
 		loginresult.UserHash = (string)json
 			["DisplayClaims"].AsGodotDictionary()
 			["xui"].AsGodotArray()
@@ -87,9 +87,9 @@ public static class MSA
 
 		var jstr = await new RequestBuilder("https://xsts.auth.xboxlive.com/xsts/authorize")
 			.Header("Accept","application/json")
-			.PostJson<string>(JSON.Stringify(reqJson));
+			.PostJson<string>(Json.Stringify(reqJson));
 
-		var json = JSON.ParseString(jstr).AsGodotDictionary();
+		var json = Json.ParseString(jstr).AsGodotDictionary();
 
 		return (string)json["Token"];
 	}

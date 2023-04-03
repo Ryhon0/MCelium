@@ -19,8 +19,6 @@ public partial class Main : Control
 	string Clientid = "b26b832c-d001-4dd0-943c-fcc3fd812964";
 
 	[Export]
-	SkinViewer SkinViewer;
-	[Export]
 	ItemList InstanceList;
 	[Export]
 	Control InstanceProperties;
@@ -45,6 +43,41 @@ public partial class Main : Control
 		InstanceProperties.Hide();
 		InstanceList.Clear();
 
+		if (File.Exists(Paths.Profiles))
+		{
+			var j = await File.ReadAllTextAsync(Paths.Profiles);
+			Profiles = System.Text.Json.JsonSerializer.Deserialize<List<Profile>>(j);
+
+			foreach(var p in Profiles)
+			{
+				if(p.MCTokenExpiresIn <= DateTime.Now)
+				{
+					var t = await MSA.RefreshAccessToken(p.MSARefreshToken, Clientid, OAuthScopes);
+					p.MSARefreshToken = t.RefreshToken;
+					
+					var xbl = await MSA.XboxLogIn(t.AccessToken);
+					var xsts = await MSA.GetMinecraftXSTS(xbl.Token);
+					var mcl = await Minecraft.LogIn(xbl.UserHash, xsts);
+
+					p.MCToken = mcl.AccessToken;
+					p.MCTokenExpiresIn = DateTime.Now.AddSeconds(mcl.ExpiresInSeconds);
+
+					p.MCProfile = await Minecraft.GetProfile(p.MCToken);
+				}
+			}
+
+			var pj = System.Text.Json.JsonSerializer.Serialize(Profiles);
+			await File.WriteAllTextAsync(Paths.Profiles, pj);
+			
+			SkinsMain();
+		}
+		else
+		{
+			var p = MSAPopupScene.Instantiate<MSAPopup>();
+			AddChild(p);
+			p.Authenticate();
+		}
+
 		Java.Versions = await Java.LoadVersions();
 		Instances = await Instance.LoadInstances();
 
@@ -58,18 +91,6 @@ public partial class Main : Control
 			InstanceList.SetItemText(id, "New instance");
 		}
 		InstanceList.GrabFocus();
-
-		if (File.Exists(Paths.Profiles))
-		{
-			var j = await File.ReadAllTextAsync(Paths.Profiles);
-			Profiles = System.Text.Json.JsonSerializer.Deserialize<List<Profile>>(j);
-		}
-		else
-		{
-			var p = MSAPopupScene.Instantiate<MSAPopup>();
-			AddChild(p);
-			p.Authenticate();
-		}
 	}
 
 	void OnInstanceSelected(int idx)

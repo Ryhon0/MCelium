@@ -48,6 +48,9 @@ public class RequestBuilder
 	public async Task<T> Post<T>()
 		=> await Send<T>(HttpMethod.Post);
 
+	public async Task<T> Post<T>(byte[] dat, string mimetype)
+		=> await Send<T>(HttpMethod.Post, dat, mimetype);
+
 	public async Task<T> PostJson<T>(string json)
 		=> await Send<T>(HttpMethod.Post, Encoding.UTF8.GetBytes(
 				json), "application/json");

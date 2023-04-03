@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://62cjsn2ruii5"
+uid="uid://ckppxlqxk6cws"
 path="res://.godot/imported/player_rigged.glb-f2d946b8b35a9f755954c5573a35e801.scn"
 
 [deps]
@@ -31,7 +31,7 @@ _subresources={
 "materials": {
 "Material": {
 "use_external/enabled": true,
-"use_external/path": "res://Models/player.tres"
+"use_external/path": "res://Assets/Models/player.tres"
 }
 }
 }
