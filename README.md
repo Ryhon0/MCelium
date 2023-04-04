@@ -30,3 +30,8 @@ Cross-platform gamepad friendly launcher for Minecraft Java and Bedrock Edition.
 - [ ] Downloading Bedrock Edition
 - [ ] Launching Bedrock Edition
 - [ ] Java Edition crossplay using Geyser
+
+# References
+* [Inside a Minecraft Launcher](https://ryanccn.dev/posts/inside-a-minecraft-launcher/)
+* [Modrinth Docs](https://docs.modrinth.com/api-spec/)
+* [Fabric Metadata API](https://github.com/FabricMC/fabric-meta#fabric-meta)
